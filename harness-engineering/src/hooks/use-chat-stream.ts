@@ -60,7 +60,14 @@ export function useChatStream({ sessionId, model, agentSessionId, onAgentSession
         ))
       })
 
-      es.addEventListener("thinking", () => {})
+      es.addEventListener("thinking", (e) => {
+        const data = JSON.parse(e.data)
+        setMessages((prev) => prev.map((m) =>
+          m.id === assistantMsgId
+            ? { ...m, thoughtContent: (m.thoughtContent || "") + data.content }
+            : m
+        ))
+      })
 
       es.addEventListener("permission_request", (e) => {
         const data = JSON.parse(e.data)
