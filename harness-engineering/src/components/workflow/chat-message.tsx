@@ -1,5 +1,6 @@
 import type { ChatMessage as ChatMessageType } from "@/types/chat"
 import { PermissionCard } from "./permission-card"
+import { ThoughtBlock } from "./thought-block"
 import { cn } from "@/lib/utils"
 import { User, Bot } from "lucide-react"
 
@@ -26,6 +27,9 @@ export function ChatMessage({ message, onResolvePermission }: ChatMessageProps) 
         </div>
       )}
       <div className={cn("rounded-lg px-3 py-2 max-w-[80%] text-sm", isUser ? "bg-primary text-primary-foreground" : "bg-card border")}>
+        {message.thoughtContent && (
+          <ThoughtBlock content={message.thoughtContent} isStreaming={!!message.isStreaming} />
+        )}
         <div className="whitespace-pre-wrap break-words">{message.content || (message.isStreaming ? "..." : "")}</div>
         {message.isStreaming && <span className="inline-block w-1.5 h-4 bg-current animate-pulse ml-0.5" />}
       </div>
