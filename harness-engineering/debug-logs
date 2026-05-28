@@ -1,0 +1,138 @@
+2026-05-28T04:38:56.426Z [DEBUG] MDM settings load completed in 11ms
+2026-05-28T04:38:56.444Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\Program Files\ClaudeCode\managed-settings.json
+2026-05-28T04:38:56.444Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: D:\codes\harness\harness-engineering\.claude\settings.json
+2026-05-28T04:38:56.444Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: D:\codes\harness\harness-engineering\.claude\settings.local.json
+2026-05-28T04:38:56.445Z [DEBUG] CA certs: Config fallback - globalEnv keys: , settingsEnv keys: ANTHROPIC_AUTH_TOKEN,ANTHROPIC_BASE_URL,ANTHROPIC_MODEL
+2026-05-28T04:38:56.445Z [DEBUG] [init] configureGlobalMTLS starting
+2026-05-28T04:38:56.447Z [DEBUG] [init] configureGlobalMTLS complete
+2026-05-28T04:38:56.447Z [DEBUG] [init] configureGlobalAgents starting
+2026-05-28T04:38:56.447Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-05-28T04:38:56.448Z [DEBUG] CA certs: Loaded 145 bundled root certificates
+2026-05-28T04:38:56.455Z [DEBUG] CA certs: Loaded 82 system CA certificates
+2026-05-28T04:38:56.456Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-05-28T04:38:56.456Z [DEBUG] [init] configureGlobalAgents complete
+2026-05-28T04:38:56.458Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-05-28T04:38:56.460Z [DEBUG] Error log sink initialized
+2026-05-28T04:38:56.468Z [DEBUG] [claudeai-mcp] Disabled: API-key auth precedence active
+2026-05-28T04:38:56.468Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-05-28T04:38:56.471Z [DEBUG] [STARTUP] Running setup()...
+2026-05-28T04:38:56.472Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\Program Files\ClaudeCode\managed-settings.json
+2026-05-28T04:38:56.473Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: D:\codes\harness\harness-engineering\.claude\settings.json
+2026-05-28T04:38:56.473Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: D:\codes\harness\harness-engineering\.claude\settings.local.json
+2026-05-28T04:38:56.474Z [DEBUG] Loading skills from: managed=C:\Program Files\ClaudeCode\.claude\skills, user=C:\Users\qx_wa\.claude\skills, project=[]
+2026-05-28T04:38:56.475Z [DEBUG] Error log sink initialized
+2026-05-28T04:38:56.482Z [DEBUG] Failed to stat directory C:\Program Files\ClaudeCode\.claude\commands: ENOENT: no such file or directory, stat 'C:\Program Files\ClaudeCode\.claude\commands'
+2026-05-28T04:38:56.482Z [DEBUG] Failed to stat directory C:\Users\qx_wa\.claude\commands: ENOENT: no such file or directory, stat 'C:\Users\qx_wa\.claude\commands'
+2026-05-28T04:38:56.482Z [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-05-28T04:38:56.483Z [DEBUG] Failed to stat directory C:\Users\qx_wa\.claude\agents: ENOENT: no such file or directory, stat 'C:\Users\qx_wa\.claude\agents'
+2026-05-28T04:38:56.483Z [DEBUG] Failed to stat directory C:\Program Files\ClaudeCode\.claude\agents: ENOENT: no such file or directory, stat 'C:\Program Files\ClaudeCode\.claude\agents'
+2026-05-28T04:38:56.486Z [DEBUG] [STARTUP] setup() completed in 15ms
+2026-05-28T04:38:56.486Z [DEBUG] Cleared CA certificates cache
+2026-05-28T04:38:56.486Z [DEBUG] Cleared mTLS configuration cache
+2026-05-28T04:38:56.486Z [DEBUG] Cleared proxy agent cache
+2026-05-28T04:38:56.487Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-05-28T04:38:56.487Z [DEBUG] CA certs: Loaded 145 bundled root certificates
+2026-05-28T04:38:56.487Z [DEBUG] CA certs: Loaded 82 system CA certificates
+2026-05-28T04:38:56.487Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-05-28T04:38:56.507Z [DEBUG] Loaded 1 installed plugins from C:\Users\qx_wa\.claude\plugins\installed_plugins.json
+2026-05-28T04:38:56.523Z [DEBUG] Read hooks.json for plugin superpowers (enabled=true): C:\Users\qx_wa\.claude\plugins\cache\superpowers-marketplace\superpowers\5.0.7\hooks\hooks.json
+2026-05-28T04:38:56.524Z [DEBUG] Found 1 plugins (1 enabled, 0 disabled)
+2026-05-28T04:38:56.525Z [DEBUG] getPluginSkills: Processing 1 enabled plugins
+2026-05-28T04:38:56.525Z [DEBUG] Checking plugin superpowers: skillsPath=exists, skillsPaths=0 paths
+2026-05-28T04:38:56.525Z [DEBUG] Attempting to load skills from plugin superpowers default skillsPath: C:\Users\qx_wa\.claude\plugins\cache\superpowers-marketplace\superpowers\5.0.7\skills
+2026-05-28T04:38:56.526Z [DEBUG] Loading hooks from plugin: superpowers
+2026-05-28T04:38:56.526Z [DEBUG] Registered 1 hooks from 1 plugins
+2026-05-28T04:38:56.565Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-05-28T04:38:56.565Z [DEBUG] Total plugin commands loaded: 3
+2026-05-28T04:38:56.566Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-05-28T04:38:56.566Z [DEBUG] Total plugin agents loaded: 1
+2026-05-28T04:38:56.569Z [DEBUG] Loaded 14 skills from plugin superpowers default directory
+2026-05-28T04:38:56.569Z [DEBUG] Total plugin skills loaded: 14
+2026-05-28T04:38:56.569Z [DEBUG] getSkills returning: 0 skill dir commands, 14 plugin skills, 14 bundled skills, 0 builtin plugin skills
+2026-05-28T04:38:56.572Z [DEBUG] Git remote URL: null
+2026-05-28T04:38:56.572Z [DEBUG] No git remote URL found
+2026-05-28T04:38:57.435Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-05-28T04:38:57.435Z [DEBUG] [ToolSearch:optimistic] disabled: ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding is not a first-party Anthropic host. Set ENABLE_TOOL_SEARCH=true (or auto / auto:N) if your proxy forwards tool_reference blocks.
+2026-05-28T04:38:57.436Z [DEBUG] [STARTUP] Commands and agents loaded in 1ms
+2026-05-28T04:38:57.436Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-05-28T04:38:57.437Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-05-28T04:38:57.437Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-05-28T04:38:57.437Z [DEBUG] Starting background startup prefetches
+2026-05-28T04:38:57.438Z [DEBUG] [Bootstrap] Fetching
+2026-05-28T04:38:57.442Z [DEBUG] [STARTUP] MCP configs resolved in 95ms (awaited at +974ms)
+2026-05-28T04:38:57.443Z [DEBUG] All plugins already exist, skipping migration
+2026-05-28T04:38:57.443Z [DEBUG] Cleared CA certificates cache
+2026-05-28T04:38:57.444Z [DEBUG] Cleared mTLS configuration cache
+2026-05-28T04:38:57.444Z [DEBUG] Cleared proxy agent cache
+2026-05-28T04:38:57.444Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-05-28T04:38:57.444Z [DEBUG] CA certs: Loaded 145 bundled root certificates
+2026-05-28T04:38:57.444Z [DEBUG] CA certs: Loaded 82 system CA certificates
+2026-05-28T04:38:57.444Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-05-28T04:38:57.445Z [DEBUG] Initialized versioned plugins system with 1 plugins
+2026-05-28T04:38:57.447Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.447Z [DEBUG] [MCP] --mcp-config servers running fully async (nonblocking)
+2026-05-28T04:38:57.447Z [DEBUG] [MCP] claude.ai connectors running fully async (nonblocking)
+2026-05-28T04:38:57.455Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-05-28T04:38:57.455Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-05-28T04:38:57.459Z [WARN] [3P telemetry] Event dropped (no event logger initialized): hook_execution_start
+2026-05-28T04:38:57.467Z [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=opt-in disabledBySettings=false model=glm-5.1 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+2026-05-28T04:38:57.476Z [DEBUG] Total LSP servers loaded: 0
+2026-05-28T04:38:57.477Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-05-28T04:38:57.477Z [DEBUG] LSP manager initialized with 0 servers
+2026-05-28T04:38:57.477Z [DEBUG] LSP server manager initialized successfully
+2026-05-28T04:38:57.477Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-05-28T04:38:57.479Z [DEBUG] Failed to stat directory C:\Users\qx_wa\.claude\skills: ENOENT: no such file or directory, stat 'C:\Users\qx_wa\.claude\skills'
+2026-05-28T04:38:57.480Z [DEBUG] Failed to stat directory C:\Program Files\ClaudeCode\.claude\skills: ENOENT: no such file or directory, stat 'C:\Program Files\ClaudeCode\.claude\skills'
+2026-05-28T04:38:57.508Z [DEBUG] Watching for changes in setting files C:\Users\qx_wa\.claude\settings.json...
+2026-05-28T04:38:57.523Z [DEBUG] Ripgrep first use test: PASSED (mode=embedded, path=D:\codes\harness\harness-engineering\node_modules\@anthropic-ai\claude-agent-sdk-win32-x64\claude.exe)
+2026-05-28T04:38:57.660Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-05-28T04:38:57.661Z [DEBUG] "Hook SessionStart:startup (SessionStart) success:\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"SessionStart\",\n    \"additionalContext\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<SUBAGENT-STOP>\\nIf you were dispatched as a subagent to execute a specific task, skip this skill.\\n</SUBAGENT-STOP>\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## Instruction Priority\\n\\nSuperpowers skills override default system prompt behavior, but **user instructions always take precedence**:\\n\\n1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests) — highest priority\\n2. **Superpowers skills** — override default system behavior where they conflict\\n3. **Default system prompt** — lowest priority\\n\\nIf CLAUDE.md, GEMINI.md, or AGENTS.md says \\\"don't use TDD\\\" and a skill says \\\"always use TDD,\\\" follow the user's instructions. The user is in control.\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.\\n\\n**In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n## Platform Adaptation\\n\\nSkills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\"\n  }\n}\n"
+2026-05-28T04:38:57.662Z [DEBUG] Hook SessionStart ("${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" session-start) provided additionalContext (5632 chars)
+2026-05-28T04:38:57.665Z [DEBUG] [ScheduledTasks] scheduler start() — enabled=false, hasTasks=false
+2026-05-28T04:38:57.672Z [DEBUG] installPluginsForHeadless: starting
+2026-05-28T04:38:57.672Z [DEBUG] Failed to stat directory C:\Program Files\ClaudeCode\.claude\output-styles: ENOENT: no such file or directory, stat 'C:\Program Files\ClaudeCode\.claude\output-styles'
+2026-05-28T04:38:57.673Z [DEBUG] Failed to stat directory C:\Users\qx_wa\.claude\output-styles: ENOENT: no such file or directory, stat 'C:\Users\qx_wa\.claude\output-styles'
+2026-05-28T04:38:57.673Z [DEBUG] Total plugin output styles loaded: 0
+2026-05-28T04:38:57.673Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.677Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-28T04:38:57.678Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-28T04:38:57.678Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-28T04:38:57.678Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-28T04:38:57.678Z [DEBUG] Sending 29 skills via attachment (initial)
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:brainstorming" (userFacingName="brainstorming")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:dispatching-parallel-agents" (userFacingName="dispatching-parallel-agents")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:executing-plans" (userFacingName="executing-plans")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:receiving-code-review" (userFacingName="receiving-code-review")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:test-driven-development" (userFacingName="test-driven-development")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:verification-before-completion" (userFacingName="verification-before-completion")
+2026-05-28T04:38:57.679Z [DEBUG] Skill prompt: showing "superpowers:requesting-code-review" (userFacingName="requesting-code-review")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:writing-plans" (userFacingName="writing-plans")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:using-superpowers" (userFacingName="using-superpowers")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:finishing-a-development-branch" (userFacingName="finishing-a-development-branch")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:writing-skills" (userFacingName="writing-skills")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:systematic-debugging" (userFacingName="systematic-debugging")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:using-git-worktrees" (userFacingName="using-git-worktrees")
+2026-05-28T04:38:57.680Z [DEBUG] Skill prompt: showing "superpowers:subagent-driven-development" (userFacingName="subagent-driven-development")
+2026-05-28T04:38:57.681Z [WARN] Skill listing over budget: 29 skills, 6261 chars > 6000 budget — descriptions will be truncated. Run /doctor for details.
+2026-05-28T04:38:57.688Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.692Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-05-28T04:38:57.694Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.153.306; cc_entrypoint=sdk-ts; cch=00000;
+2026-05-28T04:38:57.694Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.695Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.695Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-28T04:38:57.696Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-28T04:38:57.696Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-28T04:38:57.697Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:57.697Z [DEBUG] [API:timing] dispatching to firstParty model=glm-5.1
+2026-05-28T04:38:57.699Z [DEBUG] [API REQUEST] /api/coding/v1/messages source=sdk
+2026-05-28T04:38:58.203Z [DEBUG] [Bootstrap] Fetch failed: 403
+2026-05-28T04:38:58.203Z [ERROR] [Bootstrap] fetchBootstrapData failed: AxiosError: Request failed with status code 403
+2026-05-28T04:38:58.204Z [ERROR] Failed to fetch org fast mode status, defaulting to disabled (network_error): AxiosError: Request failed with status code 403
+2026-05-28T04:38:59.352Z [DEBUG] Stream started - received first chunk
+2026-05-28T04:38:59.353Z [DEBUG] [API:timing] first byte after 1656ms
+2026-05-28T04:38:59.914Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-05-28T04:38:59.918Z [DEBUG] LSP server manager shut down successfully
+2026-05-28T04:38:59.919Z [DEBUG] Metrics export disabled by organization setting
+2026-05-28T04:38:59.919Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-28T04:38:59.919Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-28T04:38:59.919Z [DEBUG] BigQuery metrics exporter shutdown complete
