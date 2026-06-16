@@ -15,7 +15,7 @@
         <span>Skills</span>
       </el-menu-item>
       <el-menu-item index="/agents">
-        <el-icon><Robot /></el-icon>
+        <el-icon><Service /></el-icon>
         <span>Agents</span>
       </el-menu-item>
       <el-menu-item index="/workflow">
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { MagicStick, Robot, Connection, Sunny, Moon } from '@element-plus/icons-vue'
+import { MagicStick, Service, Connection, Sunny, Moon } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()

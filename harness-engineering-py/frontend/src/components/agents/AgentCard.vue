@@ -24,7 +24,7 @@ const props = defineProps<{ agent: Agent }>()
 
 const iconComponent = computed(() => {
   const iconMap: Record<string, any> = {
-    Bot: Icons.Robot,
+    Bot: Icons.Service,
     FlaskConical: Icons.Orange,
     Server: Icons.Monitor,
     BookOpen: Icons.Reading,
@@ -33,7 +33,7 @@ const iconComponent = computed(() => {
     Blocks: Icons.Grid,
     GitBranch: Icons.Connection,
   }
-  return iconMap[props.agent.icon] || Icons.Robot
+  return iconMap[props.agent.icon] || Icons.Service
 })
 </script>
 
