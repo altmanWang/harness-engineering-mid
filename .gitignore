@@ -5,3 +5,4 @@ __pycache__/
 harness-engineering/node_modules/
 harness-engineering/.next/
 ACEHarness-main
+.worktrees/
