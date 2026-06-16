@@ -4,5 +4,6 @@ __pycache__/
 .idea.worktrees/
 harness-engineering/node_modules/
 harness-engineering/.next/
+harness-engineering-py/frontend/node_modules/
 ACEHarness-main
 .worktrees/

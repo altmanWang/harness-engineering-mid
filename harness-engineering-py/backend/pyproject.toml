@@ -1,0 +1,11 @@
+[project]
+name = "harness-engineering-backend"
+version = "1.0.0"
+description = "Harness Engineering FastAPI backend"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.0.0",
+    "aiofiles>=24.0.0",
+]
