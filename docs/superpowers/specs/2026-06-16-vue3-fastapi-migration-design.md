@@ -10,7 +10,7 @@
 
 ### 1.1 背景
 
-现有 `harness-engineering/` 是一个基于 Next.js 16 App Router 的单体应用，包含 Skills/Agents 市场 + 使用 Dashboard + Workflow 聊天界面。前端使用 React 19 + Tailwind CSS 3，后端 API 通过 Next.js Route Handlers 实现，AI 引擎通过 ACP 协议驱动本地 OpenCode CLI。
+现有 `harness-engineering/` 是一个基于 Next.js 16 App Router 的单体应用，包含 Skills/Agents 市场 + Workflow 聊天界面。前端使用 React 19 + Tailwind CSS 3，后端 API 通过 Next.js Route Handlers 实现，AI 引擎通过 ACP 协议驱动本地 OpenCode CLI。
 
 ### 1.2 目标
 
@@ -28,7 +28,6 @@
 | 状态管理 | Pinia + composables 混合 |
 | 会话存储 | 文件系统 JSON |
 | 构建工具 | Vite |
-| 图表库 | ECharts |
 | CSS 方案 | Element Plus SCSS 变量定制 |
 
 ---
@@ -38,10 +37,10 @@
 ```
 ┌─────────────── Vue 3 SPA (Vite) ───────────────┐
 │                                                   │
-│  Dashboard  Skills  Agents  Workflow              │
-│  (mock数据) (mock)  (mock)  (SSE 实时)            │
-│       │       │       │       │                   │
-│       ▼       ▼       ▼       ▼                   │
+│  Skills      Agents      Workflow                 │
+│  (mock数据)  (mock数据)  (SSE 实时)               │
+│       │         │           │                     │
+│       ▼         ▼           ▼                     │
 │  ┌─────────────────────────────────────────────┐  │
 │  │         Pinia Stores + Composables          │  │
 │  │  chat store │ engine store │ useChatStream  │  │
@@ -71,7 +70,7 @@
 
 ### 2.1 数据流
 
-1. **Dashboard/Skills/Agents** — Vue 前端直接用 mock 数据渲染，不经过后端
+1. **Skills/Agents** — Vue 前端直接用 mock 数据渲染，不经过后端
 2. **Workflow 聊天** — `POST /api/chat/stream` 发起消息 → 后端创建引擎执行 → `GET /api/chat/stream?id=xxx` SSE 流式返回 → 前端 EventSource 接收
 3. **权限流程** — SSE 推送 permission_request → 用户点击选项 → `POST /api/chat/permission` → 后端 resolve → 引擎继续执行
 4. **会话管理** — CRUD 通过 `/api/chat/sessions`，存储为 `data/chat-sessions/{id}.json`
@@ -92,25 +91,19 @@ harness-engineering-py/
 │       ├── App.vue
 │       ├── main.ts              # createApp, Pinia, Router, Element Plus
 │       ├── router/
-│       │   └── index.ts         # 4 条路由
+│       │   └── index.ts         # 3 条路由
 │       ├── types/
-│       │   ├── index.ts         # MarketItem, DashboardStats, TrendPoint 等
+│       │   ├── index.ts         # MarketItem, Skill, Agent 等
 │       │   └── chat.ts          # ChatMessage, ChatSession, SSEEvent 等
 │       ├── mock/
-│       │   └── data.ts          # 12 skills + 8 agents + dashboard 数据
+│       │   └── data.ts          # 12 skills + 8 agents 数据
 │       ├── views/
-│       │   ├── DashboardView.vue
 │       │   ├── SkillsView.vue
 │       │   ├── AgentsView.vue
 │       │   └── WorkflowView.vue
 │       ├── components/
 │       │   ├── layout/
 │       │   │   └── Navbar.vue
-│       │   ├── dashboard/
-│       │   │   ├── StatsCards.vue
-│       │   │   ├── UsageTrend.vue
-│       │   │   ├── UsageRanking.vue
-│       │   │   └── WorkflowCard.vue
 │       │   ├── skills/
 │       │   │   ├── SkillCard.vue
 │       │   │   └── SkillFilter.vue
@@ -163,8 +156,7 @@ harness-engineering-py/
 
 | 路径 | 视图 | 说明 |
 |------|------|------|
-| `/` | 重定向到 `/dashboard` | |
-| `/dashboard` | `DashboardView.vue` | 仪表盘 |
+| `/` | 重定向到 `/skills` | |
 | `/skills` | `SkillsView.vue` | Skills 市场 |
 | `/agents` | `AgentsView.vue` | Agents 市场 |
 | `/workflow` | `WorkflowView.vue` | 聊天工作台 |
@@ -173,11 +165,7 @@ harness-engineering-py/
 
 | React 组件 | Vue 组件 | Element Plus 替代 |
 |-----------|---------|------------------|
-| `navbar.tsx` | `Navbar.vue` | `el-menu` 替代手写 nav |
-| `stats-cards.tsx` | `StatsCards.vue` | `el-row` / `el-col` / `el-card` |
-| `usage-trend.tsx` | `UsageTrend.vue` | ECharts 替代 Recharts |
-| `usage-ranking.tsx` | `UsageRanking.vue` | 手写排名列表 |
-| `workflow-card.tsx` | `WorkflowCard.vue` | `el-card` |
+| `navbar.tsx` | `Navbar.vue` | `el-menu` 替代手写 nav（3 项：Skills, Agents, Workflow） |
 | `skill-card.tsx` | `SkillCard.vue` | `el-card` |
 | `skill-filter.tsx` | `SkillFilter.vue` | `el-input` + `el-tag` |
 | `agent-card.tsx` | `AgentCard.vue` | `el-card` |
