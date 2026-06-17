@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify:sidebar-layout": "node scripts/verify-sidebar-layout.mjs"
   },
   "dependencies": {
     "vue": "^3.5.0",
