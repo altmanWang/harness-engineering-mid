@@ -8,7 +8,7 @@
         class="prompt-card"
         @click="$emit('select', card.prompt)"
       >
-        <span class="card-icon">
+        <span class="card-icon" aria-hidden="true">
           <el-icon><component :is="card.icon" /></el-icon>
         </span>
         <span class="card-title">{{ card.title }}</span>
@@ -85,6 +85,11 @@ defineEmits<{
 
 .prompt-card:active {
   transform: translateY(0);
+}
+
+.prompt-card:focus-visible {
+  outline: 2px solid var(--el-color-primary);
+  outline-offset: 2px;
 }
 
 .card-icon {
