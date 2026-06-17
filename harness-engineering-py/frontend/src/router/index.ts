@@ -18,11 +18,6 @@ const router = createRouter({
       name: 'Agents',
       component: () => import('@/views/AgentsView.vue'),
     },
-    {
-      path: '/workflow',
-      name: 'Workflow',
-      component: () => import('@/views/WorkflowView.vue'),
-    },
   ],
 })
 

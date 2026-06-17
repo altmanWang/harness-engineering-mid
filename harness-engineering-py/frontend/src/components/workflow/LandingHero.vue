@@ -42,7 +42,7 @@ function onCardSelect(prompt: string) {
 
 <style scoped>
 .landing-hero {
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

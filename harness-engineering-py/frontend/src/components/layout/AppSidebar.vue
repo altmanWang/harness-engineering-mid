@@ -117,13 +117,13 @@ function go(path: string) {
 }
 
 function goHome() {
-  router.push('/workflow')
+  router.push('/')
 }
 
 async function handleNewSession() {
   try {
     await chatStore.createSession()
-    router.push('/workflow')
+    router.push('/')
   } catch (err) {
     console.error('Failed to create session:', err)
   }
@@ -131,7 +131,7 @@ async function handleNewSession() {
 
 function handleSelectSession(id: string) {
   chatStore.selectSession(id)
-  router.push('/workflow')
+  router.push('/')
 }
 
 async function handleDeleteSession(id: string) {
