@@ -44,7 +44,7 @@ export async function createEngine(): Promise<Engine | null> {
 export async function detectEngines(): Promise<EngineAvailability[]> {
   const engine = new OpenCodeEngineWrapper()
   const available = await engine.isAvailable()
-  const models = available ? await readOpenCodeModels() : []
+  const models = await readOpenCodeModels()
   return [{ available, name: "OpenCode", models, defaultModel: models[0]?.id }]
 }
 

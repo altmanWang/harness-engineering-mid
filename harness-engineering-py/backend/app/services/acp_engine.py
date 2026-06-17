@@ -78,7 +78,7 @@ class ACPEngine:
     async def create_session(self) -> str:
         if not self.initialized:
             raise RuntimeError("Not initialized")
-        result = await self._send_request("newSession", {
+        result = await self._send_request("session/new", {
             "cwd": self.config.get("workingDirectory", os.getcwd()),
             "mcpServers": [],
         })
@@ -93,7 +93,7 @@ class ACPEngine:
     async def resume_session(self, session_id: str) -> str:
         if not self.initialized:
             raise RuntimeError("Not initialized")
-        result = await self._send_request("loadSession", {
+        result = await self._send_request("session/load", {
             "sessionId": session_id,
             "cwd": self.config.get("workingDirectory", os.getcwd()),
             "mcpServers": [],
@@ -104,7 +104,7 @@ class ACPEngine:
     async def send_prompt(self, prompt: str) -> str:
         if not self.session_id:
             raise RuntimeError("No active session")
-        result = await self._send_request("prompt", {
+        result = await self._send_request("session/prompt", {
             "sessionId": self.session_id,
             "prompt": [{"type": "text", "text": prompt}],
         })
@@ -114,7 +114,7 @@ class ACPEngine:
         if not self.session_id:
             raise RuntimeError("No active session")
         self._model = model_id
-        await self._send_request("unstable_setSessionModel", {
+        await self._send_request("session/set_model", {
             "sessionId": self.session_id,
             "modelId": model_id,
         })
@@ -130,7 +130,7 @@ class ACPEngine:
 
     def cancel_session(self) -> None:
         if self.session_id:
-            asyncio.create_task(self._send_request("cancel", {"sessionId": self.session_id}))
+            self._send_notification("session/cancel", {"sessionId": self.session_id})
 
     def stop(self) -> None:
         self._stopping = True
@@ -150,13 +150,9 @@ class ACPEngine:
     async def _send_request(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
         self._request_id += 1
         req_id = self._request_id
-        request = json.dumps({"jsonrpc": "2.0", "id": req_id, "method": method, "params": params})
         future: asyncio.Future = asyncio.get_event_loop().create_future()
         self._pending_requests[req_id] = future
-
-        if self.process and self.process.stdin:
-            self.process.stdin.write((request + "\n").encode())
-            self.process.stdin.flush()
+        self._write_message({"jsonrpc": "2.0", "id": req_id, "method": method, "params": params})
 
         try:
             return await asyncio.wait_for(future, timeout=300)
@@ -164,22 +160,29 @@ class ACPEngine:
             self._pending_requests.pop(req_id, None)
             raise RuntimeError(f"Request {method} timed out")
 
+    def _send_response(self, req_id: int, result: Dict[str, Any]) -> None:
+        self._write_message({"jsonrpc": "2.0", "id": req_id, "result": result})
+
+    def _send_notification(self, method: str, params: Dict[str, Any]) -> None:
+        self._write_message({"jsonrpc": "2.0", "method": method, "params": params})
+
+    def _write_message(self, message: Dict[str, Any]) -> None:
+        if self.process and self.process.stdin:
+            self.process.stdin.write((json.dumps(message) + "\n").encode())
+            self.process.stdin.flush()
+
     async def _read_loop(self) -> None:
         if not self.process or not self.process.stdout:
             return
         loop = asyncio.get_event_loop()
-        buffer = b""
         while not self._stopping and self.process and self.process.stdout:
             try:
-                chunk = await loop.run_in_executor(None, self.process.stdout.read, 4096)
-                if not chunk:
+                line = await loop.run_in_executor(None, self.process.stdout.readline)
+                if not line:
                     break
-                buffer += chunk
-                while b"\n" in buffer:
-                    line, buffer = buffer.split(b"\n", 1)
-                    line = line.strip()
-                    if line:
-                        self._handle_line(line.decode("utf-8", errors="replace"))
+                line = line.strip()
+                if line:
+                    self._handle_line(line.decode("utf-8", errors="replace"))
             except Exception:
                 break
 
@@ -203,12 +206,10 @@ class ACPEngine:
             method = msg["method"]
             params = msg.get("params", {})
 
-            if method == "sessionUpdate":
+            if method in ("session/update", "sessionUpdate", "sessionNotification"):
                 self._handle_session_update(params.get("update", params))
-            elif method == "requestPermission":
-                self._handle_permission(params)
-            elif method == "sessionNotification":
-                self._handle_session_update(params.get("update", params))
+            elif method in ("session/request_permission", "requestPermission"):
+                self._handle_permission(params, msg.get("id"))
 
     def _handle_session_update(self, update: Dict[str, Any]) -> None:
         update_type = update.get("sessionUpdate", "")
@@ -234,30 +235,14 @@ class ACPEngine:
                 "rawOutput": update.get("rawOutput", ""),
             })
 
-    def _handle_permission(self, params: Dict[str, Any]) -> None:
+    def _handle_permission(self, params: Dict[str, Any], req_id: Optional[int] = None) -> None:
         self._emit("permission", params)
-        # Create a resolver future that will be resolved by resolve_permission()
-        loop = asyncio.get_event_loop()
-        future = loop.create_future()
 
         def resolver(response: Dict[str, Any]) -> None:
-            if not future.done():
-                future.set_result(response)
+            if req_id is not None:
+                self._send_response(req_id, response)
 
         self._permission_resolver = resolver
-
-        async def send_response():
-            try:
-                result = await future
-                await self._send_request("respondPermission", {
-                    "sessionId": self.session_id,
-                    "requestId": params.get("id", ""),
-                    "response": result,
-                })
-            except Exception:
-                pass
-
-        asyncio.create_task(send_response())
 
     async def _read_stderr(self) -> None:
         if not self.process or not self.process.stderr:

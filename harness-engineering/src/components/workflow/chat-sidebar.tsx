@@ -20,7 +20,7 @@ export function ChatSidebar({ sessions, currentSessionId, model, onSelectSession
       const engines: EngineAvailability[] = data.engines || []
       setEngineInfo(engines[0] || null)
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch((err) => { console.error("[ChatSidebar] Failed to fetch engine availability:", err); setLoading(false) })
   }, [])
 
   useEffect(() => {

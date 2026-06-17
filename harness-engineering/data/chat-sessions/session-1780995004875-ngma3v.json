@@ -1,0 +1,22 @@
+{
+  "id": "session-1780995004875-ngma3v",
+  "title": "你是什么模型",
+  "engine": "claude-code",
+  "model": "volcengine-plan/glm-5.1",
+  "messages": [
+    {
+      "id": "msg-1780995015486",
+      "role": "user",
+      "content": "你是什么模型",
+      "timestamp": "2026-06-09T08:50:15.486Z"
+    },
+    {
+      "id": "msg-assistant-chat-1780995015066",
+      "role": "assistant",
+      "content": "",
+      "timestamp": "2026-06-12T02:44:40.917Z"
+    }
+  ],
+  "createdAt": "2026-06-09T08:50:04.875Z",
+  "updatedAt": "2026-06-12T02:44:40.918Z"
+}
