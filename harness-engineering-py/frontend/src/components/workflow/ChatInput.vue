@@ -49,10 +49,12 @@
 import { ref } from 'vue'
 import { Promotion, CloseBold } from '@element-plus/icons-vue'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   isStreaming: boolean
   variant?: 'compact' | 'full'
-}>()
+}>(), {
+  variant: 'compact',
+})
 
 const emit = defineEmits<{
   send: [content: string]
