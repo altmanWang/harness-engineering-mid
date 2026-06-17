@@ -6,6 +6,7 @@ interface UseChatStreamOptions {
   model: string
   agentSessionId?: string
   onAgentSessionIdChange?: (id: string) => void
+  onDone?: () => void | Promise<void>
 }
 
 export function useChatStream(options: UseChatStreamOptions) {
@@ -91,13 +92,14 @@ export function useChatStream(options: UseChatStreamOptions) {
         })
       })
 
-      es.addEventListener('done', (e) => {
+      es.addEventListener('done', async (e) => {
         const data = JSON.parse(e.data)
         if (data.sessionId && options.onAgentSessionIdChange) {
           options.onAgentSessionIdChange(data.sessionId)
         }
         updateAssistant(assistantMsgId, { isStreaming: false })
         isStreaming.value = false
+        await options.onDone?.()
         es.close()
         eventSource = null
       })

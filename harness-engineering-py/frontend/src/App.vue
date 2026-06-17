@@ -1,6 +1,6 @@
 <template>
-  <div id="app-root">
-    <Navbar />
+  <div id="app-root" class="app-shell">
+    <AppSidebar />
     <main class="app-main">
       <router-view />
     </main>
@@ -8,24 +8,38 @@
 </template>
 
 <script setup lang="ts">
-import Navbar from '@/components/layout/Navbar.vue'
+import AppSidebar from '@/components/layout/AppSidebar.vue'
 </script>
 
 <style>
-html, body, #app {
+html,
+body,
+#app {
   margin: 0;
   padding: 0;
   height: 100%;
 }
-#app-root {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+
+* {
+  box-sizing: border-box;
 }
+
+body {
+  background: #f7f7f4;
+}
+
+.app-shell {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  background: #f7f7f4;
+}
+
 .app-main {
   flex: 1;
+  min-width: 0;
+  height: 100vh;
   overflow: auto;
-  padding: 24px;
-  background: var(--el-bg-color-page);
+  background: #f7f7f4;
 }
 </style>
