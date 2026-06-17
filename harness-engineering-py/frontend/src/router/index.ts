@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/skills',
+      redirect: '/workflow',
     },
     {
       path: '/skills',
