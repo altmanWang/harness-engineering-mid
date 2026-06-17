@@ -1,0 +1,55 @@
+{
+  "id": "session-1781695485927-xpgx4r",
+  "title": "hi",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_12aac62baffecmM0nB6hlpQRwz",
+  "messages": [
+    {
+      "id": "msg-1781695485975",
+      "role": "user",
+      "content": "hi",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:24:45.975068+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781695485937",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:24:47.401922+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781695511953",
+      "role": "user",
+      "content": "hi",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:25:11.953482+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781695511953",
+      "role": "assistant",
+      "content": "Hi! How can I help you today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:25:14.848066+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-17T11:24:45.927340+00:00",
+  "updatedAt": "2026-06-17T11:25:14.862961+00:00"
+}
