@@ -15,6 +15,12 @@ export const useChatStore = defineStore('chat', () => {
     sessions.value = list
   }
 
+  async function loadSessions() {
+    const res = await fetch('/api/chat/sessions')
+    const data = await res.json()
+    setSessions(data.sessions || [])
+  }
+
   function selectSession(id: string) {
     currentSessionId.value = id
     const session = sessions.value.find(s => s.id === id)
@@ -22,11 +28,32 @@ export const useChatStore = defineStore('chat', () => {
       messages.value = session.messages
       agentSessionId.value = session.agentSessionId
       model.value = session.model
-    } else {
-      // Session not found: clear current session state
-      currentSessionId.value = null
-      messages.value = []
-      agentSessionId.value = undefined
+    }
+  }
+
+  async function createSession() {
+    const res = await fetch('/api/chat/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ engine: 'opencode', model: model.value }),
+    })
+    const data = await res.json()
+    const session = data.session as ChatSession
+    setSessions([session, ...sessions.value])
+    selectSession(session.id)
+    messages.value = []
+    return session
+  }
+
+  async function deleteSession(id: string) {
+    await fetch('/api/chat/sessions', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    setSessions(sessions.value.filter(s => s.id !== id))
+    if (currentSessionId.value === id) {
+      clearSession()
     }
   }
 
@@ -36,61 +63,33 @@ export const useChatStore = defineStore('chat', () => {
     agentSessionId.value = undefined
   }
 
+  function setModel(nextModel: string) {
+    model.value = nextModel
+  }
+
   function setAgentSessionId(id: string) {
     agentSessionId.value = id
-    // Update matching session in sessions array immutably
-    if (currentSessionId.value) {
-      sessions.value = sessions.value.map(s =>
-        s.id === currentSessionId.value
-          ? { ...s, agentSessionId: id }
-          : s
-      )
-    }
-  }
-
-  async function loadSessions() {
-    const res = await fetch('/api/chat/sessions')
-    if (!res.ok) {
-      throw new Error(`Failed to load sessions: ${res.status} ${res.statusText}`)
-    }
-    const data = await res.json()
-    sessions.value = data.sessions || []
-  }
-
-  async function createSession(engine: string, modelParam?: string) {
-    const res = await fetch('/api/chat/sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ engine, model: modelParam || model.value }),
-    })
-    if (!res.ok) {
-      throw new Error(`Failed to create session: ${res.status} ${res.statusText}`)
-    }
-    const data = await res.json()
-    sessions.value = [data.session, ...sessions.value]
-    selectSession(data.session.id)
-    return data.session
-  }
-
-  async function deleteSession(id: string) {
-    const res = await fetch('/api/chat/sessions', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
-    if (!res.ok) {
-      throw new Error(`Failed to delete session: ${res.status} ${res.statusText}`)
-    }
-    sessions.value = sessions.value.filter(s => s.id !== id)
-    if (currentSessionId.value === id) {
-      clearSession()
+    const session = sessions.value.find(s => s.id === currentSessionId.value)
+    if (session) {
+      session.agentSessionId = id
     }
   }
 
   return {
-    sessions, currentSessionId, messages, isStreaming,
-    pendingPermission, model, agentSessionId,
-    setSessions, selectSession, clearSession, setAgentSessionId,
-    loadSessions, createSession, deleteSession,
+    sessions,
+    currentSessionId,
+    messages,
+    isStreaming,
+    pendingPermission,
+    model,
+    agentSessionId,
+    setSessions,
+    loadSessions,
+    selectSession,
+    createSession,
+    deleteSession,
+    clearSession,
+    setModel,
+    setAgentSessionId,
   }
 })
