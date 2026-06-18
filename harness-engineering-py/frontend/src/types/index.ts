@@ -8,5 +8,14 @@ export interface MarketItem {
   lastUsedAt: string
 }
 
-export type Skill = MarketItem
+export interface Skill {
+  id: string
+  name: string
+  description: string
+  tags: string[]
+  fileName: string
+  fileSize: number
+  createdAt: string
+}
+
 export type Agent = MarketItem
