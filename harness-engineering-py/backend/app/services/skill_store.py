@@ -1,8 +1,11 @@
 import json
 import os
+import zipfile
 import aiofiles
 from pathlib import Path
 from typing import List, Optional
+
+from app.services.worktree_manager import WORKTREES_DIR
 
 SKILLS_DIR = Path(os.getcwd()) / "data" / "skills"
 METADATA_FILE = SKILLS_DIR / "metadata.json"
@@ -64,3 +67,48 @@ async def delete_skill(skill_id: str) -> bool:
 def get_skill_zip_path(skill_id: str) -> Optional[Path]:
     zip_path = SKILLS_DIR / f"{skill_id}.zip"
     return zip_path if zip_path.exists() else None
+
+
+async def get_skill_metadata(skill_id: str) -> Optional[dict]:
+    skills = await _read_metadata()
+    for s in skills:
+        if s["id"] == skill_id:
+            return s
+    return None
+
+
+async def load_skill_to_worktree(skill_id: str, session_id: str) -> dict:
+    """Extract a skill's ZIP into the session's worktree .opencode/skills/{skill_id}/.
+
+    Idempotent: if .loaded marker exists, skip extraction.
+
+    Returns:
+        {"loaded": True, "alreadyLoaded": bool, "skillId": str, "path": str}
+    """
+    zip_path = get_skill_zip_path(skill_id)
+    if zip_path is None:
+        raise FileNotFoundError(f"Skill ZIP not found: {skill_id}")
+
+    target_dir = WORKTREES_DIR / session_id / ".opencode" / "skills" / skill_id
+    loaded_marker = target_dir / ".loaded"
+
+    if loaded_marker.exists():
+        return {
+            "loaded": True,
+            "alreadyLoaded": True,
+            "skillId": skill_id,
+            "path": str(target_dir),
+        }
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        zf.extractall(target_dir)
+
+    loaded_marker.touch()
+
+    return {
+        "loaded": True,
+        "alreadyLoaded": False,
+        "skillId": skill_id,
+        "path": str(target_dir),
+    }

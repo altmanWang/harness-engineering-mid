@@ -1,7 +1,7 @@
 import random
 import string
 import time
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
 from fastapi.responses import FileResponse
 from app.services import skill_store
 
@@ -86,3 +86,18 @@ async def delete_skill(skill_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="Skill 不存在")
     return {"deleted": True}
+
+
+@router.post("/skills/{skill_id}/load")
+async def load_skill(skill_id: str, session_id: str = Query(..., alias="sessionId")):
+    meta = await skill_store.get_skill_metadata(skill_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail="Skill 不存在")
+
+    try:
+        result = await skill_store.load_skill_to_worktree(skill_id, session_id)
+        return result
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"解压失败: {e}")

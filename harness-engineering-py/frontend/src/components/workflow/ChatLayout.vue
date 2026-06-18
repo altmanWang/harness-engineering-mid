@@ -10,9 +10,12 @@
         variant="compact"
         :model="model"
         :models="models"
+        :skills="skills"
+        :selected-skill-id="selectedSkillId"
         @send="$emit('sendMessage', $event)"
         @cancel="$emit('cancelStream')"
         @model-change="$emit('modelChange', $event)"
+        @skill-change="$emit('skillChange', $event)"
       />
     </div>
   </div>
@@ -20,6 +23,7 @@
 
 <script setup lang="ts">
 import type { ChatSession, ChatMessage, ModelInfo } from '@/types/chat'
+import type { Skill } from '@/types'
 import ChatStream from './ChatStream.vue'
 import ChatInput from './ChatInput.vue'
 
@@ -30,6 +34,8 @@ defineProps<{
   models: ModelInfo[]
   messages: ChatMessage[]
   isStreaming: boolean
+  skills?: Skill[]
+  selectedSkillId?: string
 }>()
 
 defineEmits<{
@@ -37,6 +43,7 @@ defineEmits<{
   sendMessage: [content: string]
   resolvePermission: [requestId: string, optionId: string]
   cancelStream: []
+  skillChange: [skillId: string]
 }>()
 </script>
 

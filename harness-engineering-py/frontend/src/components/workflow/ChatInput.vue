@@ -1,5 +1,10 @@
 <template>
   <div class="chat-input-area" :class="[`variant-${variant}`]">
+    <div v-if="selectedSkillName" class="skill-tag-row">
+      <el-tag size="small" closable type="warning" @close="onSkillChange('')">
+        {{ selectedSkillName }}
+      </el-tag>
+    </div>
     <div class="input-wrapper">
       <el-input
         v-model="inputText"
@@ -27,6 +32,23 @@
             :value="m.id"
           />
         </el-select>
+        <el-select
+          v-if="skills && skills.length > 0"
+          :model-value="selectedSkillId || ''"
+          size="small"
+          class="skill-dropdown"
+          popper-class="skill-dropdown-popper"
+          placeholder="技能"
+          clearable
+          @change="onSkillChange"
+        >
+          <el-option
+            v-for="s in skills"
+            :key="s.id"
+            :label="s.name"
+            :value="s.id"
+          />
+        </el-select>
         <el-button
           type="primary"
           :icon="Promotion"
@@ -44,6 +66,22 @@
               :key="m.id"
               :label="m.name"
               :value="m.id"
+            />
+          </el-select>
+        </div>
+        <div v-if="skills && skills.length > 0" class="skill-select-inline">
+          <el-select
+            :model-value="selectedSkillId || ''"
+            size="small"
+            placeholder="技能"
+            clearable
+            @change="onSkillChange"
+          >
+            <el-option
+              v-for="s in skills"
+              :key="s.id"
+              :label="s.name"
+              :value="s.id"
             />
           </el-select>
         </div>
@@ -72,28 +110,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Promotion, CloseBold } from '@element-plus/icons-vue'
 import type { ModelInfo } from '@/types/chat'
+import type { Skill } from '@/types'
 
 const props = withDefaults(defineProps<{
   isStreaming: boolean
   variant?: 'compact' | 'full'
   model: string
   models: ModelInfo[]
+  skills?: Skill[]
+  selectedSkillId?: string
 }>(), {
   variant: 'compact',
   models: () => [],
+  skills: () => [],
+  selectedSkillId: '',
 })
 
 const emit = defineEmits<{
   send: [content: string]
   cancel: []
   modelChange: [model: string]
+  skillChange: [skillId: string]
 }>()
 
 const inputText = ref('')
 const selectedModel = ref(props.model)
+
+const selectedSkillName = computed(() => {
+  if (!props.selectedSkillId || !props.skills) return ''
+  const skill = props.skills.find(s => s.id === props.selectedSkillId)
+  return skill ? skill.name : ''
+})
 
 watch(() => props.model, (val) => { selectedModel.value = val })
 
@@ -106,6 +156,10 @@ function handleSend() {
 
 function onModelChange(val: string) {
   emit('modelChange', val)
+}
+
+function onSkillChange(val: string) {
+  emit('skillChange', val || '')
 }
 </script>
 
@@ -252,6 +306,63 @@ function onModelChange(val: string) {
 }
 
 .model-select-inline :deep(.el-input__inner) {
+  font-size: 12px;
+  color: #666;
+}
+
+.skill-tag-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.chat-input-area.variant-compact .skill-tag-row {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.skill-dropdown {
+  width: auto;
+  min-width: 80px;
+}
+
+.skill-dropdown :deep(.el-input__wrapper) {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 4px;
+}
+
+.skill-dropdown :deep(.el-input__wrapper:hover),
+.skill-dropdown :deep(.el-input__wrapper.is-focus) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.skill-dropdown :deep(.el-input__inner) {
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+.skill-select-inline {
+  flex-shrink: 0;
+}
+
+.skill-select-inline :deep(.el-input__wrapper) {
+  background: transparent;
+  border: 1px solid #e8e8e2;
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 2px 10px;
+  transition: border-color 0.2s ease;
+}
+
+.skill-select-inline :deep(.el-input__wrapper:hover) {
+  border-color: #c0c0b8;
+}
+
+.skill-select-inline :deep(.el-input__inner) {
   font-size: 12px;
   color: #666;
 }

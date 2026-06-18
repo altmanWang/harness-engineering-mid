@@ -20,10 +20,13 @@
         :models="availableModels"
         :messages="chatMessages"
         :is-streaming="isStreaming"
+        :skills="skillList"
+        :selected-skill-id="selectedSkillId"
         @model-change="handleModelChange"
         @send-message="handleSendMessage"
         @resolve-permission="handleResolvePermission"
         @cancel-stream="handleCancelStream"
+        @skill-change="handleSkillChange"
       />
     </Transition>
   </div>
@@ -37,11 +40,14 @@ import { useChatStore } from '@/stores/chat'
 import { useEngineStore } from '@/stores/engine'
 import { useChatStream } from '@/composables/useChatStream'
 import type { ChatMessage, ModelInfo } from '@/types/chat'
+import type { Skill } from '@/types'
 
 const chatStore = useChatStore()
 const engineStore = useEngineStore()
 
 const availableModels = ref<ModelInfo[]>([])
+const skillList = ref<Skill[]>([])
+const selectedSkillId = ref('')
 
 const {
   messages,
@@ -81,6 +87,7 @@ watch(() => chatStore.messages, (val) => {
 onMounted(async () => {
   await chatStore.loadSessions()
   await engineStore.fetchAvailability()
+  loadSkills()
   if (engineStore.engineInfo) {
     availableModels.value = engineStore.engineInfo.models || []
     if (engineStore.engineInfo.defaultModel && !chatStore.model) {
@@ -113,6 +120,29 @@ async function handleSendMessage(content: string) {
 
 function handleModelChange(model: string) {
   chatStore.setModel(model)
+}
+
+async function loadSkills() {
+  try {
+    const res = await fetch('/api/skills')
+    if (!res.ok) return
+    const data = await res.json()
+    skillList.value = data.skills || []
+  } catch {
+    // skills not critical, fail silently
+  }
+}
+
+async function handleSkillChange(skillId: string) {
+  selectedSkillId.value = skillId
+  if (!skillId || !chatStore.currentSessionId) return
+  try {
+    await fetch(`/api/skills/${skillId}/load?sessionId=${chatStore.currentSessionId}`, {
+      method: 'POST',
+    })
+  } catch (err) {
+    console.error('Failed to load skill:', err)
+  }
 }
 
 function handleResolvePermission(requestId: string, optionId: string) {
