@@ -67,6 +67,14 @@
       </div>
     </section>
 
+    <div v-if="!isCollapsed" class="sidebar-engine">
+      <EngineInfo
+        engine-name="OpenCode"
+        :model-name="chatStore.model"
+        :models="availableModels"
+      />
+    </div>
+
     <div class="sidebar-actions">
       <el-button
         class="icon-action"
@@ -91,12 +99,17 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Clock, Delete, Expand, Fold, MagicStick, Moon, Plus, Service, Sunny } from '@element-plus/icons-vue'
 import { useChatStore } from '@/stores/chat'
+import { useEngineStore } from '@/stores/engine'
+import EngineInfo from '@/components/workflow/EngineInfo.vue'
+import type { ModelInfo } from '@/types/chat'
 
 const router = useRouter()
 const route = useRoute()
 const chatStore = useChatStore()
+const engineStore = useEngineStore()
 const isCollapsed = ref(false)
 const isDark = ref(false)
+const availableModels = ref<ModelInfo[]>([])
 
 const activeRoute = computed(() => {
   if (route.path.startsWith('/skills')) return '/skills'
@@ -106,10 +119,14 @@ const activeRoute = computed(() => {
 
 const recentSessions = computed(() => chatStore.sessions.slice(0, 8))
 
-onMounted(() => {
+onMounted(async () => {
   chatStore.loadSessions().catch((err) => {
     console.error('Failed to load sessions:', err)
   })
+  await engineStore.fetchAvailability()
+  if (engineStore.engineInfo) {
+    availableModels.value = engineStore.engineInfo.models || []
+  }
 })
 
 function go(path: string) {
@@ -117,6 +134,7 @@ function go(path: string) {
 }
 
 function goHome() {
+  chatStore.clearSession()
   router.push('/')
 }
 
@@ -155,8 +173,8 @@ function toggleTheme() {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  border-right: 1px solid var(--el-border-color-lighter);
-  background: rgba(255, 255, 255, 0.92);
+  border-right: 1px solid #e8e8e2;
+  background: rgba(255, 255, 255, 0.85);
   transition: width 0.18s ease;
 }
 .app-sidebar.collapsed {

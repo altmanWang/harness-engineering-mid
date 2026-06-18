@@ -5,8 +5,11 @@
         v-if="isLanding"
         key="landing"
         :is-streaming="isStreaming"
+        :model="chatStore.model"
+        :models="availableModels"
         @send="handleFirstSend"
         @cancel="handleCancelStream"
+        @model-change="handleModelChange"
       />
       <ChatLayout
         v-else
@@ -14,6 +17,7 @@
         :sessions="chatStore.sessions"
         :current-session-id="chatStore.currentSessionId"
         :model="chatStore.model"
+        :models="availableModels"
         :messages="chatMessages"
         :is-streaming="isStreaming"
         @model-change="handleModelChange"
@@ -30,10 +34,14 @@ import { computed, onMounted, ref, watch } from 'vue'
 import LandingHero from '@/components/workflow/LandingHero.vue'
 import ChatLayout from '@/components/workflow/ChatLayout.vue'
 import { useChatStore } from '@/stores/chat'
+import { useEngineStore } from '@/stores/engine'
 import { useChatStream } from '@/composables/useChatStream'
-import type { ChatMessage } from '@/types/chat'
+import type { ChatMessage, ModelInfo } from '@/types/chat'
 
 const chatStore = useChatStore()
+const engineStore = useEngineStore()
+
+const availableModels = ref<ModelInfo[]>([])
 
 const {
   messages,
@@ -72,6 +80,13 @@ watch(() => chatStore.messages, (val) => {
 
 onMounted(async () => {
   await chatStore.loadSessions()
+  await engineStore.fetchAvailability()
+  if (engineStore.engineInfo) {
+    availableModels.value = engineStore.engineInfo.models || []
+    if (engineStore.engineInfo.defaultModel && !chatStore.model) {
+      chatStore.setModel(engineStore.engineInfo.defaultModel)
+    }
+  }
 })
 
 async function handleFirstSend(content: string) {

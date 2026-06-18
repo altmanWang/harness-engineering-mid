@@ -25,14 +25,14 @@ body,
 }
 
 body {
-  background: #f7f7f4;
+  background: #f5f5f1;
 }
 
 .app-shell {
   display: flex;
   height: 100%;
   min-width: 0;
-  background: #f7f7f4;
+  background: #f5f5f1;
 }
 
 .app-main {
@@ -40,6 +40,6 @@ body {
   min-width: 0;
   height: 100vh;
   overflow: auto;
-  background: #f7f7f4;
+  background: #f5f5f1;
 }
 </style>

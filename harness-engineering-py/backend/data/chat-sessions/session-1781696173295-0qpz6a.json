@@ -1,0 +1,55 @@
+{
+  "id": "session-1781696173295-0qpz6a",
+  "title": "你是什么模型",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v4-flash",
+  "agentSessionId": "ses_12aa1cf6cffehntCIE18bLe1q9",
+  "messages": [
+    {
+      "id": "msg-1781696179104",
+      "role": "user",
+      "content": "你是什么模型",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:19.104174+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781696179067",
+      "role": "assistant",
+      "content": "deepseek-v4-flash",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:23.081606+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781696190392",
+      "role": "user",
+      "content": "你能做什么",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:30.392135+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781696190392",
+      "role": "assistant",
+      "content": "我是 opencode，一个交互式 CLI 工具，能帮你完成软件工程任务，包括：\n\n- **代码搜索与理解**：浏览代码库、查找文件、搜索内容\n- **代码编辑与重构**：修改、创建、重构代码文件\n- **命令执行**：运行构建、测试、lint 等命令\n- **Git 操作**：提交、推送、创建 PR 等\n- **Web 获取**：从 URL 获取内容\n\n当前工作目录是 `harness-engineering-py/backend`，一个 FastAPI 后端项目。有什么需要帮忙的吗？",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:34.854103+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-17T11:36:13.295774+00:00",
+  "updatedAt": "2026-06-17T11:36:34.869190+00:00"
+}

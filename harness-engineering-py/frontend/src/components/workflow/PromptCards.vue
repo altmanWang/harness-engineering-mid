@@ -50,7 +50,7 @@ defineEmits<{
 
 <style scoped>
 .prompt-cards-section {
-  margin-top: 32px;
+  margin-top: 40px;
   display: flex;
   justify-content: center;
 }
@@ -58,7 +58,7 @@ defineEmits<{
 .prompt-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
   max-width: 640px;
   width: 100%;
 }
@@ -66,29 +66,31 @@ defineEmits<{
 .prompt-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 14px;
-  background: var(--el-bg-color);
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #e8e8e2;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
   font-family: inherit;
-  color: var(--el-text-color-primary);
+  color: #3d3d3a;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .prompt-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border-color: var(--el-color-primary-light-5);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #c8c8c0;
+  transform: translateY(-1px);
 }
 
 .prompt-card:active {
   transform: translateY(0);
+  background: #f0f0ec;
 }
 
 .prompt-card:focus-visible {
-  outline: 2px solid var(--el-color-primary);
+  outline: 2px solid #1a1a1a;
   outline-offset: 2px;
 }
 
@@ -96,17 +98,17 @@ defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 8px;
-  background: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
+  background: #f0f0ea;
+  color: #5a5a55;
   flex-shrink: 0;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }

@@ -8,15 +8,18 @@
       <ChatInput
         :is-streaming="isStreaming"
         variant="compact"
+        :model="model"
+        :models="models"
         @send="$emit('sendMessage', $event)"
         @cancel="$emit('cancelStream')"
+        @model-change="$emit('modelChange', $event)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ChatSession, ChatMessage } from '@/types/chat'
+import type { ChatSession, ChatMessage, ModelInfo } from '@/types/chat'
 import ChatStream from './ChatStream.vue'
 import ChatInput from './ChatInput.vue'
 
@@ -24,6 +27,7 @@ defineProps<{
   sessions: ChatSession[]
   currentSessionId: string | null
   model: string
+  models: ModelInfo[]
   messages: ChatMessage[]
   isStreaming: boolean
 }>()
@@ -42,7 +46,7 @@ defineEmits<{
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: #f7f7f4;
+  background: #f5f5f1;
 }
 
 .chat-main {

@@ -1,0 +1,33 @@
+{
+  "id": "session-1781705874405-uo90qw",
+  "title": "推荐适合我需求的 Agent",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_12a0dded3ffeWYaCD2rPrp7eqf",
+  "messages": [
+    {
+      "id": "msg-1781705874454",
+      "role": "user",
+      "content": "推荐适合我需求的 Agent",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T14:17:54.454115+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781705874413",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T14:17:55.857221+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-17T14:17:54.405434+00:00",
+  "updatedAt": "2026-06-17T14:17:55.873201+00:00"
+}

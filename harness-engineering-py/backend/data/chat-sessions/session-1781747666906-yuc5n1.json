@@ -1,0 +1,33 @@
+{
+  "id": "session-1781747666906-yuc5n1",
+  "title": "hi",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v4-pro",
+  "agentSessionId": "ses_127902aa8ffeuTs3TJV81MP6Z4",
+  "messages": [
+    {
+      "id": "msg-1781747666952",
+      "role": "user",
+      "content": "hi",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T01:54:26.952437+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781747666911",
+      "role": "assistant",
+      "content": "Hi! How can I help you today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T01:54:32.908199+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T01:54:26.906361+00:00",
+  "updatedAt": "2026-06-18T01:54:32.928749+00:00"
+}

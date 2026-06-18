@@ -48,8 +48,30 @@
       "permissionRequest": null,
       "permissionDecision": null,
       "isStreaming": null
+    },
+    {
+      "id": "msg-1781696167787",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:07.787382+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781696167749",
+      "role": "assistant",
+      "content": "Hello! What would you like to work on?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T11:36:11.440286+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
     }
   ],
   "createdAt": "2026-06-17T11:24:45.927340+00:00",
-  "updatedAt": "2026-06-17T11:25:14.862961+00:00"
+  "updatedAt": "2026-06-17T11:36:11.453955+00:00"
 }

@@ -1,22 +1,28 @@
 <template>
   <div class="landing-hero">
     <div class="landing-content">
-      <div class="brand-section">
-        <div class="brand-mark">H</div>
-        <h1 class="brand-name">Harness</h1>
+      <!-- 极简品牌标识 -->
+      <div class="brand-row">
+        <button class="brand-dot" type="button" aria-label="Harness" />
       </div>
 
-      <p class="welcome-text">Hi，今天想做什么？</p>
+      <!-- 大号问候 -->
+      <h1 class="greeting">Hi，今天想做什么？</h1>
 
+      <!-- 核心输入区 -->
       <div class="hero-input">
         <ChatInput
           :is-streaming="isStreaming"
           variant="full"
+          :model="model"
+          :models="models"
           @send="$emit('send', $event)"
           @cancel="$emit('cancel')"
+          @model-change="$emit('modelChange', $event)"
         />
       </div>
 
+      <!-- 提示卡片 -->
       <PromptCards @select="onCardSelect" />
     </div>
   </div>
@@ -25,14 +31,18 @@
 <script setup lang="ts">
 import ChatInput from './ChatInput.vue'
 import PromptCards from './PromptCards.vue'
+import type { ModelInfo } from '@/types/chat'
 
 defineProps<{
   isStreaming: boolean
+  model: string
+  models: ModelInfo[]
 }>()
 
 const emit = defineEmits<{
   send: [content: string]
   cancel: []
+  modelChange: [model: string]
 }>()
 
 function onCardSelect(prompt: string) {
@@ -46,7 +56,7 @@ function onCardSelect(prompt: string) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7f7f4;
+  background: #f5f5f1;
 }
 
 .landing-content {
@@ -54,46 +64,59 @@ function onCardSelect(prompt: string) {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 720px;
-  padding: 0 24px;
-  margin-top: -60px;
+  max-width: 680px;
+  padding: 0 32px;
+  margin-top: -80px;
 }
 
-.brand-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+/* 极简品牌点 */
+.brand-row {
+  margin-bottom: 40px;
 }
 
-.brand-mark {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--el-color-primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
+.brand-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: #1a1a1a;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
 }
 
-.brand-name {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--el-text-color-primary);
+.brand-dot:hover {
+  transform: scale(1.3);
 }
 
-.welcome-text {
-  margin: 0 0 28px 0;
-  font-size: 18px;
-  color: var(--el-text-color-regular);
-  font-weight: 450;
+/* 问候语 */
+.greeting {
+  margin: 0 0 36px 0;
+  font-size: 32px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  text-align: center;
 }
 
+/* 核心输入区 */
 .hero-input {
   width: 100%;
+}
+
+@media (max-width: 640px) {
+  .landing-content {
+    padding: 0 20px;
+    margin-top: -60px;
+  }
+
+  .greeting {
+    font-size: 26px;
+    margin-bottom: 28px;
+  }
+
+  .brand-row {
+    margin-bottom: 28px;
+  }
 }
 </style>

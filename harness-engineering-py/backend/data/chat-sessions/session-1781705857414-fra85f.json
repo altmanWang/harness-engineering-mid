@@ -1,0 +1,33 @@
+{
+  "id": "session-1781705857414-fra85f",
+  "title": "帮我分析数据并生成可视化报告",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_12a0e2125ffe4gYNjGyb6chKmN",
+  "messages": [
+    {
+      "id": "msg-1781705857469",
+      "role": "user",
+      "content": "帮我分析数据并生成可视化报告",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T14:17:37.469548+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781705857426",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-17T14:17:38.871441+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-17T14:17:37.414637+00:00",
+  "updatedAt": "2026-06-17T14:17:38.885805+00:00"
+}

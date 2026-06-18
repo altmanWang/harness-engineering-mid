@@ -1,0 +1,33 @@
+{
+  "id": "session-1781745045991-x7lyp8",
+  "title": "帮我创建一个自动化工作流",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_127b82837ffe55RyyltWvModz3",
+  "messages": [
+    {
+      "id": "msg-1781745046050",
+      "role": "user",
+      "content": "帮我创建一个自动化工作流",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T01:10:46.050121+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781745045997",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T01:10:47.593958+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T01:10:45.991557+00:00",
+  "updatedAt": "2026-06-18T01:10:47.606607+00:00"
+}
