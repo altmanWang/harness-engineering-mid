@@ -33,7 +33,6 @@
           />
         </el-select>
         <el-select
-          v-if="skills && skills.length > 0"
           :model-value="selectedSkillId || ''"
           size="small"
           class="skill-dropdown"
@@ -69,7 +68,7 @@
             />
           </el-select>
         </div>
-        <div v-if="skills && skills.length > 0" class="skill-select-inline">
+        <div class="skill-select-inline">
           <el-select
             :model-value="selectedSkillId || ''"
             size="small"
