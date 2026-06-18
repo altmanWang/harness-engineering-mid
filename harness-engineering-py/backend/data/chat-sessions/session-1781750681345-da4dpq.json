@@ -1,0 +1,33 @@
+{
+  "id": "session-1781750681345-da4dpq",
+  "title": "你是谁",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_127622b90ffe5fNbuGE7RGdjl1",
+  "messages": [
+    {
+      "id": "msg-1781750681390",
+      "role": "user",
+      "content": "你是谁",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:44:41.390050+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781750681351",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:44:42.836645+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T02:44:41.345255+00:00",
+  "updatedAt": "2026-06-18T02:44:42.850368+00:00"
+}

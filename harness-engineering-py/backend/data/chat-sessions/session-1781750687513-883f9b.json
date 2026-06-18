@@ -1,0 +1,66 @@
+{
+  "id": "session-1781750687513-883f9b",
+  "title": "你是谁",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12761a906ffeIxVSl8m5fZctOZ",
+  "messages": [
+    {
+      "id": "msg-1781750687560",
+      "role": "user",
+      "content": "你是谁",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:44:47.560556+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781750714898",
+      "role": "user",
+      "content": "你是谁",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:45:14.898952+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781750714898",
+      "role": "assistant",
+      "content": "我是 opencode，一个帮助您处理软件工程任务的交互式 CLI 工具。我可以协助您进行代码分析、调试、文件操作、运行命令等开发相关任务。",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:45:20.461029+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781750729860",
+      "role": "user",
+      "content": "你能做什么",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:45:29.860598+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781750729860",
+      "role": "assistant",
+      "content": "我可以帮助您：\n\n1. 代码分析和搜索（查找文件、搜索代码内容）\n2. 文件操作（读取、编辑、创建文件）\n3. 运行命令（bash、npm、git 等）\n4. 调试和测试\n5. 代码重构和优化\n6. 项目配置和设置\n\n基于当前项目，我可以帮助您处理后端（Python/FastAPI）和前端（Next.js）的开发任务。",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T02:45:37.208236+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T02:44:47.513940+00:00",
+  "updatedAt": "2026-06-18T02:45:37.222508+00:00"
+}

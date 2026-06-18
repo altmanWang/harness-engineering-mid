@@ -1,0 +1,33 @@
+{
+  "id": "session-1781754293218-s0rv7j",
+  "title": "你是谁",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v4-pro",
+  "agentSessionId": "ses_1272b0d6fffesWo1wXmprgqsdU",
+  "messages": [
+    {
+      "id": "msg-1781754293269",
+      "role": "user",
+      "content": "你是谁",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:44:53.269387+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781754293226",
+      "role": "assistant",
+      "content": "我是 OpenCode，一个命令行 AI 编程助手，帮助你完成软件工程任务。",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:45:00.095788+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T03:44:53.218567+00:00",
+  "updatedAt": "2026-06-18T03:45:00.112642+00:00"
+}

@@ -1,0 +1,55 @@
+{
+  "id": "session-1781752542900-wc5f1r",
+  "title": "hello",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12745c3c5ffevGhS0O4A7fgT19",
+  "messages": [
+    {
+      "id": "msg-1781752542949",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:15:42.949972+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781752542907",
+      "role": "assistant",
+      "content": "Hello! I'm here to help with your software engineering tasks. What would you like to work on today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:15:48.136215+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781752648132",
+      "role": "user",
+      "content": "你能干什么",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:17:28.132353+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781752648132",
+      "role": "assistant",
+      "content": "我能帮你处理软件工程任务，包括：\n\n1. 代码编写、调试和重构\n2. 文件搜索、编辑和创建\n3. 运行命令和测试\n4. 代码库分析和理解\n5. 解决bug和添加新功能\n\n你可以让我查看代码、运行测试、修改文件等。需要我帮你做什么？",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T03:17:34.167642+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T03:15:42.900213+00:00",
+  "updatedAt": "2026-06-18T03:17:34.185826+00:00"
+}

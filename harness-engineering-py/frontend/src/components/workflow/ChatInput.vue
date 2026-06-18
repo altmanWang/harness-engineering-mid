@@ -116,9 +116,9 @@ function onModelChange(val: string) {
 }
 
 .chat-input-area.variant-compact {
-  padding: 12px 16px;
-  border-top: 1px solid var(--el-border-color-light);
-  background: var(--el-bg-color);
+  padding: 16px 20px;
+  background: #fff;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.03);
 }
 
 .chat-input-area.variant-full {
@@ -133,18 +133,18 @@ function onModelChange(val: string) {
 
 .chat-input-area.variant-full .chat-input-field {
   border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .chat-input-area.variant-full :deep(.el-textarea__inner) {
   border-radius: 24px;
-  padding: 16px 110px 16px 22px;
+  padding: 18px 110px 18px 24px;
   font-size: 16px;
   line-height: 1.65;
   min-height: 60px;
-  border: 1.5px solid #e8e8e2;
+  border: 1.5px solid transparent;
   background: #fff;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   resize: none;
 }
 
@@ -154,7 +154,8 @@ function onModelChange(val: string) {
 
 .chat-input-area.variant-full :deep(.el-textarea__inner:focus) {
   border-color: #1a1a1a;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .full-actions {
@@ -193,11 +194,32 @@ function onModelChange(val: string) {
 .chat-input-area.variant-full :deep(.el-button--large.is-circle) {
   width: 40px;
   height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.chat-input-area.variant-full :deep(.el-button--large.is-circle:hover) {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transform: scale(1.05);
 }
 
 .chat-input-area.variant-compact .input-wrapper {
   width: 100%;
   max-width: 768px;
+}
+
+.chat-input-area.variant-compact :deep(.el-input__wrapper) {
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.chat-input-area.variant-compact :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.chat-input-area.variant-compact :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .input-actions {
@@ -214,5 +236,23 @@ function onModelChange(val: string) {
 
 .model-select-inline {
   flex-shrink: 0;
+}
+
+.model-select-inline :deep(.el-input__wrapper) {
+  background: transparent;
+  border: 1px solid #e8e8e2;
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 2px 10px;
+  transition: border-color 0.2s ease;
+}
+
+.model-select-inline :deep(.el-input__wrapper:hover) {
+  border-color: #c0c0b8;
+}
+
+.model-select-inline :deep(.el-input__inner) {
+  font-size: 12px;
+  color: #666;
 }
 </style>
