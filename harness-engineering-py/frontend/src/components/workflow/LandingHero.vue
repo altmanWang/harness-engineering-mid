@@ -16,9 +16,12 @@
           variant="full"
           :model="model"
           :models="models"
+          :skills="skills"
+          :selected-skill-id="selectedSkillId"
           @send="$emit('send', $event)"
           @cancel="$emit('cancel')"
           @model-change="$emit('modelChange', $event)"
+          @skill-change="$emit('skillChange', $event)"
         />
       </div>
 
@@ -32,17 +35,21 @@
 import ChatInput from './ChatInput.vue'
 import PromptCards from './PromptCards.vue'
 import type { ModelInfo } from '@/types/chat'
+import type { Skill } from '@/types'
 
 defineProps<{
   isStreaming: boolean
   model: string
   models: ModelInfo[]
+  skills?: Skill[]
+  selectedSkillId?: string
 }>()
 
 const emit = defineEmits<{
   send: [content: string]
   cancel: []
   modelChange: [model: string]
+  skillChange: [skillId: string]
 }>()
 
 function onCardSelect(prompt: string) {

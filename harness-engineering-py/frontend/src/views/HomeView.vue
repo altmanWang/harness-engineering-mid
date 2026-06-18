@@ -7,9 +7,12 @@
         :is-streaming="isStreaming"
         :model="chatStore.model"
         :models="availableModels"
+        :skills="skillList"
+        :selected-skill-id="selectedSkillId"
         @send="handleFirstSend"
         @cancel="handleCancelStream"
         @model-change="handleModelChange"
+        @skill-change="handleSkillChange"
       />
       <ChatLayout
         v-else

@@ -78,18 +78,24 @@ async def get_skill_metadata(skill_id: str) -> Optional[dict]:
 
 
 async def load_skill_to_worktree(skill_id: str, session_id: str) -> dict:
-    """Extract a skill's ZIP into the session's worktree .opencode/skills/{skill_id}/.
+    """Extract a skill's ZIP into the session's worktree .opencode/skills/{skill_name}/.
 
+    Directory name is derived from the skill's name (without .zip suffix).
     Idempotent: if .loaded marker exists, skip extraction.
 
     Returns:
         {"loaded": True, "alreadyLoaded": bool, "skillId": str, "path": str}
     """
+    meta = await get_skill_metadata(skill_id)
+    if meta is None:
+        raise FileNotFoundError(f"Skill not found: {skill_id}")
+
     zip_path = get_skill_zip_path(skill_id)
     if zip_path is None:
         raise FileNotFoundError(f"Skill ZIP not found: {skill_id}")
 
-    target_dir = WORKTREES_DIR / session_id / ".opencode" / "skills" / skill_id
+    skill_name = meta["name"].removesuffix(".zip")
+    target_dir = WORKTREES_DIR / session_id / ".opencode" / "skills" / skill_name
     loaded_marker = target_dir / ".loaded"
 
     if loaded_marker.exists():
