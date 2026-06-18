@@ -11,12 +11,12 @@
       <el-tag
         :type="selectedTags.length === 0 ? 'primary' : 'info'"
         class="filter-tag"
-        @click="onTagChange([])"
+        @click="$emit('update:selectedTags', [])"
       >
         全部
       </el-tag>
       <el-tag
-        v-for="tag in tags"
+        v-for="tag in FIXED_TAGS"
         :key="tag"
         :type="selectedTags.includes(tag) ? 'primary' : 'info'"
         class="filter-tag"
@@ -32,8 +32,9 @@
 import { ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 
+const FIXED_TAGS = ['代码开发', 'DSL', '悍马平台', '数据']
+
 const props = defineProps<{
-  tags: string[]
   selectedTags: string[]
   searchQuery: string
 }>()
@@ -56,10 +57,6 @@ function toggleTag(tag: string) {
   } else {
     emit('update:selectedTags', [...current, tag])
   }
-}
-
-function onTagChange(tags: string[]) {
-  emit('update:selectedTags', tags)
 }
 
 function onSearchChange(val: string | number) {
