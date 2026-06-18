@@ -1,77 +1,87 @@
 <template>
   <el-card shadow="hover" class="skill-card">
-    <div class="skill-header">
-      <div class="skill-icon">
-        <el-icon :size="20"><component :is="iconComponent" /></el-icon>
-      </div>
-      <div class="skill-info">
-        <h3 class="skill-name">{{ skill.name }}</h3>
-        <p class="skill-desc">{{ skill.description }}</p>
-      </div>
+    <div class="skill-info">
+      <h3 class="skill-name">{{ skill.name }}</h3>
+      <p class="skill-desc">{{ skill.description }}</p>
     </div>
     <div class="skill-tags">
       <el-tag v-for="tag in skill.tags" :key="tag" size="small" type="info">{{ tag }}</el-tag>
+    </div>
+    <div class="skill-meta">
+      <span class="skill-size">{{ formatFileSize(skill.fileSize) }}</span>
+      <span class="skill-date">{{ formatDate(skill.createdAt) }}</span>
+    </div>
+    <div class="skill-actions">
+      <el-button size="small" :icon="Download" type="primary" plain @click="onDownload">
+        下载
+      </el-button>
+      <el-button size="small" :icon="Delete" type="danger" plain @click="onDelete">
+        删除
+      </el-button>
     </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import * as Icons from '@element-plus/icons-vue'
+import { Download, Delete } from '@element-plus/icons-vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import type { Skill } from '@/types'
 
 const props = defineProps<{ skill: Skill }>()
 
-const iconComponent = computed(() => {
-  const iconMap: Record<string, any> = {
-    Code: Icons.Document,
-    TestTube: Icons.Orange,
-    Search: Icons.Search,
-    FileText: Icons.Document,
-    Rocket: Icons.Promotion,
-    Database: Icons.Coin,
-    Gauge: Icons.Odometer,
-    Webhook: Icons.Link,
-    Shield: Icons.Lock,
-    ScrollText: Icons.Tickets,
-    Package: Icons.Box,
-    Settings: Icons.Setting,
+const emit = defineEmits<{
+  deleted: [id: string]
+}>()
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+function onDownload() {
+  window.open(`/api/skills/${props.skill.id}/download`, '_blank')
+}
+
+async function onDelete() {
+  try {
+    await ElMessageBox.confirm(`确定要删除 "${props.skill.name}" 吗？`, '确认删除', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+  } catch {
+    return
   }
-  return iconMap[props.skill.icon] || Icons.MagicStick
-})
+  try {
+    const res = await fetch(`/api/skills/${props.skill.id}`, { method: 'DELETE' })
+    if (!res.ok) throw new Error('删除失败')
+    ElMessage.success('删除成功')
+    emit('deleted', props.skill.id)
+  } catch {
+    ElMessage.error('删除失败')
+  }
+}
 </script>
 
 <style scoped>
 .skill-card {
-  cursor: pointer;
   transition: transform 0.2s;
 }
 .skill-card:hover {
   transform: translateY(-2px);
 }
-.skill-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.skill-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-  flex-shrink: 0;
-}
 .skill-info {
   min-width: 0;
-  flex: 1;
 }
 .skill-name {
-  margin: 0 0 4px;
-  font-size: 14px;
+  margin: 0 0 6px;
+  font-size: 15px;
   font-weight: 600;
 }
 .skill-desc {
@@ -87,6 +97,18 @@ const iconComponent = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-top: 12px;
+}
+.skill-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #999;
+}
+.skill-actions {
+  display: flex;
+  gap: 8px;
   margin-top: 12px;
 }
 </style>
