@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import time
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -16,6 +15,7 @@ from app.services.stream_state import (
 )
 from app.services.session_store import append_message, update_session_agent_id
 from app.services.permission_queue import register_pending_permission, resolve_permission
+from app.services.worktree_manager import ensure_worktree
 
 router = APIRouter()
 
@@ -71,7 +71,7 @@ async def start_chat(body: SendMessageRequest):
             result = await engine.execute({
                 "prompt": body.message,
                 "model": body.model or "",
-                "workingDirectory": os.getcwd(),
+                "workingDirectory": str(ensure_worktree(body.sessionId or None)),
                 "sessionId": body.agentSessionId or None,
             })
             if body.sessionId:
