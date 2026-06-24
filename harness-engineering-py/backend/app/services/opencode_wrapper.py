@@ -39,6 +39,11 @@ class OpenCodeEngineWrapper(Engine):
         self._collected_output = ""
 
         prompt = options.get("prompt", "")
+        # OpenCode interprets leading "/" as a slash command (e.g. /help, /clear)
+        # and consumes it locally without sending to the AI agent.
+        # Strip it so skill-name-like queries reach the LLM.
+        if prompt.startswith("/"):
+            prompt = prompt.lstrip("/")
         model = options.get("model", "")
         session_id = options.get("sessionId")
         working_directory = options.get("workingDirectory", os.getcwd())

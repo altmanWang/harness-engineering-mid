@@ -1,10 +1,5 @@
 <template>
   <div class="chat-input-area" :class="[`variant-${variant}`]">
-    <div v-if="selectedSkillName" class="skill-tag-row">
-      <el-tag size="small" closable type="warning" @close="onSkillChange('')">
-        {{ selectedSkillName }}
-      </el-tag>
-    </div>
     <div class="input-wrapper">
       <el-input
         v-model="inputText"
@@ -21,10 +16,13 @@
           v-if="models.length > 0"
           :model-value="model"
           size="small"
-          class="model-dropdown"
-          popper-class="model-dropdown-popper"
+          class="mini-select"
+          popper-class="mini-select-popper"
           @change="onModelChange"
         >
+          <template #prefix>
+            <el-icon class="select-prefix-icon"><Cpu /></el-icon>
+          </template>
           <el-option
             v-for="m in models"
             :key="m.id"
@@ -35,12 +33,15 @@
         <el-select
           :model-value="selectedSkillId || ''"
           size="small"
-          class="skill-dropdown"
-          popper-class="skill-dropdown-popper"
+          class="mini-select"
+          popper-class="mini-select-popper"
           placeholder="技能"
           clearable
           @change="onSkillChange"
         >
+          <template #prefix>
+            <el-icon class="select-prefix-icon"><MagicStick /></el-icon>
+          </template>
           <el-option
             v-for="s in skills"
             :key="s.id"
@@ -58,31 +59,39 @@
         />
       </div>
       <div v-if="variant === 'compact'" class="input-actions">
-        <div v-if="models.length > 0" class="model-select-inline">
-          <el-select v-model="selectedModel" size="small" @change="onModelChange">
-            <el-option
-              v-for="m in models"
-              :key="m.id"
-              :label="m.name"
-              :value="m.id"
-            />
-          </el-select>
-        </div>
-        <div class="skill-select-inline">
-          <el-select
-            :model-value="selectedSkillId || ''"
-            size="small"
-            placeholder="技能"
-            clearable
-            @change="onSkillChange"
-          >
-            <el-option
-              v-for="s in skills"
-              :key="s.id"
-              :label="s.name"
-              :value="s.id"
-            />
-          </el-select>
+        <div class="action-selects">
+          <div v-if="models.length > 0" class="mini-select-wrap">
+            <el-select v-model="selectedModel" size="small" @change="onModelChange">
+              <template #prefix>
+                <el-icon class="select-prefix-icon"><Cpu /></el-icon>
+              </template>
+              <el-option
+                v-for="m in models"
+                :key="m.id"
+                :label="m.name"
+                :value="m.id"
+              />
+            </el-select>
+          </div>
+          <div class="mini-select-wrap">
+            <el-select
+              :model-value="selectedSkillId || ''"
+              size="small"
+              placeholder="技能"
+              clearable
+              @change="onSkillChange"
+            >
+              <template #prefix>
+                <el-icon class="select-prefix-icon"><MagicStick /></el-icon>
+              </template>
+              <el-option
+                v-for="s in skills"
+                :key="s.id"
+                :label="s.name"
+                :value="s.id"
+              />
+            </el-select>
+          </div>
         </div>
         <div class="input-actions-right">
           <el-button
@@ -109,8 +118,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { Promotion, CloseBold } from '@element-plus/icons-vue'
+import { ref, watch, computed, nextTick } from 'vue'
+import { Promotion, CloseBold, Cpu, MagicStick } from '@element-plus/icons-vue'
 import type { ModelInfo } from '@/types/chat'
 import type { Skill } from '@/types'
 
@@ -137,6 +146,7 @@ const emit = defineEmits<{
 
 const inputText = ref('')
 const selectedModel = ref(props.model)
+const prevSkillName = ref('')
 
 const selectedSkillName = computed(() => {
   if (!props.selectedSkillId || !props.skills) return ''
@@ -145,6 +155,31 @@ const selectedSkillName = computed(() => {
 })
 
 watch(() => props.model, (val) => { selectedModel.value = val })
+
+// Watch selectedSkillId prop to insert/remove skill prefix in input
+watch(() => props.selectedSkillId, (newId) => {
+  // Remove previous skill prefix first
+  if (prevSkillName.value) {
+    const oldPrefix = `/${prevSkillName.value} `
+    if (inputText.value.startsWith(oldPrefix)) {
+      inputText.value = inputText.value.slice(oldPrefix.length)
+    }
+  }
+
+  if (newId) {
+    const skill = props.skills?.find(s => s.id === newId)
+    if (skill) {
+      prevSkillName.value = skill.name
+      const prefix = `/${skill.name} `
+      // nextTick ensures el-input internal state picks up the change
+      nextTick(() => {
+        inputText.value = prefix + inputText.value
+      })
+    }
+  } else {
+    prevSkillName.value = ''
+  }
+})
 
 function handleSend() {
   const content = inputText.value.trim()
@@ -163,6 +198,8 @@ function onSkillChange(val: string) {
 </script>
 
 <style scoped>
+/* ===== Layout ===== */
+
 .chat-input-area {
   display: flex;
   justify-content: center;
@@ -178,11 +215,20 @@ function onSkillChange(val: string) {
   padding: 0;
 }
 
+/* ===== Input wrapper ===== */
+
 .chat-input-area.variant-full .input-wrapper {
   position: relative;
   width: 100%;
   max-width: 680px;
 }
+
+.chat-input-area.variant-compact .input-wrapper {
+  width: 100%;
+  max-width: 768px;
+}
+
+/* ===== Full variant textarea ===== */
 
 .chat-input-area.variant-full .chat-input-field {
   border-radius: 24px;
@@ -191,7 +237,7 @@ function onSkillChange(val: string) {
 
 .chat-input-area.variant-full :deep(.el-textarea__inner) {
   border-radius: 24px;
-  padding: 18px 110px 18px 24px;
+  padding: 18px 120px 18px 24px;
   font-size: 16px;
   line-height: 1.65;
   min-height: 60px;
@@ -211,55 +257,7 @@ function onSkillChange(val: string) {
   transform: translateY(-1px);
 }
 
-.full-actions {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.model-dropdown {
-  width: auto;
-  min-width: 100px;
-}
-
-.model-dropdown :deep(.el-input__wrapper) {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0 4px;
-}
-
-.model-dropdown :deep(.el-input__wrapper:hover),
-.model-dropdown :deep(.el-input__wrapper.is-focus) {
-  background: transparent;
-  box-shadow: none;
-}
-
-.model-dropdown :deep(.el-input__inner) {
-  font-size: 12px;
-  color: #999;
-  text-align: right;
-}
-
-.chat-input-area.variant-full :deep(.el-button--large.is-circle) {
-  width: 40px;
-  height: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.chat-input-area.variant-full :deep(.el-button--large.is-circle:hover) {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
-  transform: scale(1.05);
-}
-
-.chat-input-area.variant-compact .input-wrapper {
-  width: 100%;
-  max-width: 768px;
-}
+/* ===== Compact variant input ===== */
 
 .chat-input-area.variant-compact :deep(.el-input__wrapper) {
   border-radius: 20px;
@@ -275,6 +273,33 @@ function onSkillChange(val: string) {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
+/* ===== Full variant action bar (inside textarea) ===== */
+
+.full-actions {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== Send button (full variant) ===== */
+
+.chat-input-area.variant-full :deep(.el-button--large.is-circle) {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.chat-input-area.variant-full :deep(.el-button--large.is-circle:hover) {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transform: scale(1.05);
+}
+
+/* ===== Compact variant action bar ===== */
+
 .input-actions {
   display: flex;
   justify-content: space-between;
@@ -282,87 +307,108 @@ function onSkillChange(val: string) {
   margin-top: 8px;
 }
 
+.action-selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .input-actions-right {
   display: flex;
   gap: 8px;
 }
 
-.model-select-inline {
-  flex-shrink: 0;
-}
+/* ===== Unified mini-select (pill style, both variants) ===== */
 
-.model-select-inline :deep(.el-input__wrapper) {
-  background: transparent;
-  border: 1px solid #e8e8e2;
-  border-radius: 18px;
-  box-shadow: none;
-  padding: 2px 10px;
-  transition: border-color 0.2s ease;
-}
-
-.model-select-inline :deep(.el-input__wrapper:hover) {
-  border-color: #c0c0b8;
-}
-
-.model-select-inline :deep(.el-input__inner) {
-  font-size: 12px;
-  color: #666;
-}
-
-.skill-tag-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-.chat-input-area.variant-compact .skill-tag-row {
-  padding: 0;
-  margin-bottom: 8px;
-}
-
-.skill-dropdown {
+.mini-select {
   width: auto;
-  min-width: 80px;
+  min-width: 86px;
 }
 
-.skill-dropdown :deep(.el-input__wrapper) {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0 4px;
-}
-
-.skill-dropdown :deep(.el-input__wrapper:hover),
-.skill-dropdown :deep(.el-input__wrapper.is-focus) {
-  background: transparent;
-  box-shadow: none;
-}
-
-.skill-dropdown :deep(.el-input__inner) {
-  font-size: 12px;
-  color: #999;
-  text-align: right;
-}
-
-.skill-select-inline {
-  flex-shrink: 0;
-}
-
-.skill-select-inline :deep(.el-input__wrapper) {
+.mini-select :deep(.el-input__wrapper) {
   background: transparent;
   border: 1px solid #e8e8e2;
   border-radius: 18px;
   box-shadow: none;
-  padding: 2px 10px;
-  transition: border-color 0.2s ease;
+  padding: 2px 8px 2px 4px;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.skill-select-inline :deep(.el-input__wrapper:hover) {
+.mini-select :deep(.el-input__wrapper:hover) {
   border-color: #c0c0b8;
+  background: #f8f8f5;
 }
 
-.skill-select-inline :deep(.el-input__inner) {
+.mini-select :deep(.el-input__wrapper.is-focus) {
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.08);
+}
+
+.mini-select :deep(.el-input__inner) {
   font-size: 12px;
   color: #666;
+}
+
+.select-prefix-icon {
+  font-size: 13px;
+  color: #999;
+  margin-right: 2px;
+}
+
+/* Compact variant: same pill, no extra overrides needed */
+.mini-select-wrap {
+  flex-shrink: 0;
+}
+
+.mini-select-wrap :deep(.el-input__wrapper) {
+  background: transparent;
+  border: 1px solid #e8e8e2;
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 2px 8px 2px 4px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.mini-select-wrap :deep(.el-input__wrapper:hover) {
+  border-color: #c0c0b8;
+  background: #f8f8f5;
+}
+
+.mini-select-wrap :deep(.el-input__wrapper.is-focus) {
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.08);
+}
+
+.mini-select-wrap :deep(.el-input__inner) {
+  font-size: 12px;
+  color: #666;
+}
+</style>
+
+<!-- Global popper panel style (unscoped, for both variants) -->
+<style>
+.mini-select-popper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+  padding: 4px 0 !important;
+  margin-top: 4px !important;
+}
+
+.mini-select-popper .el-select-dropdown__item {
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  margin: 2px 4px;
+  transition: background 0.15s ease;
+}
+
+.mini-select-popper .el-select-dropdown__item:hover {
+  background: #f5f5f1;
+}
+
+.mini-select-popper .el-select-dropdown__item.is-selected {
+  color: #1a1a1a;
+  font-weight: 600;
+  background: #f8f8f5;
 }
 </style>

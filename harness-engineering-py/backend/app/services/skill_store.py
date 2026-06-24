@@ -1,6 +1,7 @@
 import json
 import os
 import zipfile
+import shutil
 import aiofiles
 from pathlib import Path
 from typing import List, Optional
@@ -107,8 +108,26 @@ async def load_skill_to_worktree(skill_id: str, session_id: str) -> dict:
         }
 
     target_dir.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        zf.extractall(target_dir)
+    tmp_dir = target_dir.with_name(target_dir.name + ".tmp")
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(tmp_dir)
+        # Flatten: if zip contains a single top-level dir, move its contents up
+        members = list(tmp_dir.iterdir())
+        if len(members) == 1 and members[0].is_dir():
+            for item in members[0].iterdir():
+                dest = target_dir / item.name
+                if item.is_dir():
+                    shutil.move(str(item), str(dest))
+                else:
+                    shutil.move(str(item), str(dest))
+        else:
+            for item in members:
+                shutil.move(str(item), str(target_dir / item.name))
+    finally:
+        if tmp_dir.exists():
+            shutil.rmtree(tmp_dir)
 
     loaded_marker.touch()
 

@@ -1,0 +1,22 @@
+{
+  "id": "session-1782306945818-5rhpz5",
+  "title": "获取中国巨石的近3天的数据",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v4-pro",
+  "agentSessionId": null,
+  "messages": [
+    {
+      "id": "msg-1782306945865",
+      "role": "user",
+      "content": "获取中国巨石的近3天的数据",
+      "thoughtContent": null,
+      "timestamp": "2026-06-24T13:15:45.865098+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-24T13:15:45.818839+00:00",
+  "updatedAt": "2026-06-24T13:15:45.873192+00:00"
+}

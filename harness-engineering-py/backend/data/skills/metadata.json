@@ -1,0 +1,24 @@
+[
+  {
+    "id": "skill-1781771475603-gjg55k",
+    "name": "minimax-music-gen",
+    "description": "创建一个音乐",
+    "tags": [
+      "DSL"
+    ],
+    "fileName": "minimax-music-generator.zip",
+    "fileSize": 9278,
+    "createdAt": "2026-06-18T08:31:15.603723+00:00"
+  },
+  {
+    "id": "skill-1782304193865-1uuqfm",
+    "name": "westock-data",
+    "description": "获取A股数据",
+    "tags": [
+      "数据"
+    ],
+    "fileName": "westock-data.zip",
+    "fileSize": 1235026,
+    "createdAt": "2026-06-24T12:29:53.865384+00:00"
+  }
+]

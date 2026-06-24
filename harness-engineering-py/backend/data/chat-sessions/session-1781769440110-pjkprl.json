@@ -1,0 +1,33 @@
+{
+  "id": "session-1781769440110-pjkprl",
+  "title": "hi",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12643ee69ffe34qt1cY7JI5KId",
+  "messages": [
+    {
+      "id": "msg-1781769440155",
+      "role": "user",
+      "content": "hi",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T07:57:20.155222+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781769440116",
+      "role": "assistant",
+      "content": "Hi! I'm here to help you with your software engineering tasks. What would you like to work on?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T07:57:25.511945+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T07:57:20.110262+00:00",
+  "updatedAt": "2026-06-18T07:57:25.528885+00:00"
+}

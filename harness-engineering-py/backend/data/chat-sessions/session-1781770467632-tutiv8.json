@@ -1,0 +1,55 @@
+{
+  "id": "session-1781770467632-tutiv8",
+  "title": "1",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_126344043fferWnQvDWJpaFjYD",
+  "messages": [
+    {
+      "id": "msg-1781770467681",
+      "role": "user",
+      "content": "1",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:14:27.681670+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781770467639",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:14:29.457101+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781770495391",
+      "role": "user",
+      "content": "1",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:14:55.391415+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781770495391",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:14:55.457914+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T08:14:27.632449+00:00",
+  "updatedAt": "2026-06-18T08:14:55.474716+00:00"
+}

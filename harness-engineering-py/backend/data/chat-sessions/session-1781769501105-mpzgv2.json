@@ -1,0 +1,33 @@
+{
+  "id": "session-1781769501105-mpzgv2",
+  "title": "1",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12642ffd9ffeoPON3Z5OGJq6zQ",
+  "messages": [
+    {
+      "id": "msg-1781769501151",
+      "role": "user",
+      "content": "1",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T07:58:21.151802+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781769501112",
+      "role": "assistant",
+      "content": "I see you've entered \"1\". Could you please clarify what you'd like me to help you with?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T07:58:26.787098+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T07:58:21.105260+00:00",
+  "updatedAt": "2026-06-18T07:58:26.803719+00:00"
+}

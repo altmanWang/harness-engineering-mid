@@ -1,0 +1,55 @@
+{
+  "id": "session-1781770961988-r2oikw",
+  "title": "创建1个音乐",
+  "engine": "opencode",
+  "model": "claude-sonnet-4-6",
+  "agentSessionId": "ses_1262cb566ffexBapnKWPAEeyDw",
+  "messages": [
+    {
+      "id": "msg-1781770962038",
+      "role": "user",
+      "content": "创建1个音乐",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:22:42.038394+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781770961997",
+      "role": "assistant",
+      "content": "",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:22:43.729761+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781770995812",
+      "role": "user",
+      "content": "创建一个音乐",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:23:15.812347+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781771078463",
+      "role": "user",
+      "content": "你有什么技能",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:24:38.463590+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T08:22:41.988874+00:00",
+  "updatedAt": "2026-06-18T08:24:38.472598+00:00"
+}

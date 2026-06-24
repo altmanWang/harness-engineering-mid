@@ -1,0 +1,55 @@
+{
+  "id": "session-1781774215805-3i1ion",
+  "title": "hello",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v4-pro",
+  "agentSessionId": "ses_125fb0d96ffeg8t4x2q4jZyQoA",
+  "messages": [
+    {
+      "id": "msg-1781774215852",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T09:16:55.852108+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781774215811",
+      "role": "assistant",
+      "content": "Hello! How can I help you today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T09:17:01.056097+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781774227612",
+      "role": "user",
+      "content": "你是什么模型",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T09:17:07.612705+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781774227612",
+      "role": "assistant",
+      "content": "我是 DeepSeek V4 Pro。",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T09:17:11.804963+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T09:16:55.805257+00:00",
+  "updatedAt": "2026-06-18T09:17:11.818792+00:00"
+}

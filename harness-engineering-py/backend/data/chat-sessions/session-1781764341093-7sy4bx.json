@@ -1,0 +1,33 @@
+{
+  "id": "session-1781764341093-7sy4bx",
+  "title": "hello",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12691bc41ffecW1QB52MzB30Sz",
+  "messages": [
+    {
+      "id": "msg-1781764341140",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T06:32:21.140891+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781764341100",
+      "role": "assistant",
+      "content": "Hello! I'm opencode, ready to help you with software engineering tasks. How can I assist you today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T06:32:27.391251+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T06:32:21.093922+00:00",
+  "updatedAt": "2026-06-18T06:32:27.410026+00:00"
+}

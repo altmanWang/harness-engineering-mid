@@ -1,0 +1,55 @@
+{
+  "id": "session-1781770551752-jxl3mi",
+  "title": "hello",
+  "engine": "opencode",
+  "model": "volcengine-plan/deepseek-v3.2",
+  "agentSessionId": "ses_12632f76fffejkWXdtWjNiz4Bd",
+  "messages": [
+    {
+      "id": "msg-1781770551803",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:15:51.803703+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781770551761",
+      "role": "assistant",
+      "content": "Hello! I'm opencode, ready to help with your software engineering tasks. What would you like to work on?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:15:57.369595+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-1781770564835",
+      "role": "user",
+      "content": "hello",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:16:04.835471+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    },
+    {
+      "id": "msg-assistant-chat-1781770564835",
+      "role": "assistant",
+      "content": "Hello! How can I help you with your project today?",
+      "thoughtContent": null,
+      "timestamp": "2026-06-18T08:16:09.925575+00:00",
+      "toolCalls": null,
+      "permissionRequest": null,
+      "permissionDecision": null,
+      "isStreaming": null
+    }
+  ],
+  "createdAt": "2026-06-18T08:15:51.752582+00:00",
+  "updatedAt": "2026-06-18T08:16:09.940379+00:00"
+}
