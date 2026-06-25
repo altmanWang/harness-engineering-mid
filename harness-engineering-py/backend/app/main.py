@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import sessions, chat, engines, skills
+from app.routers import sessions, chat, engines, skills, stock
 
 app = FastAPI(title="Harness Engineering API", version="1.0.0")
 
@@ -16,6 +16,7 @@ app.include_router(sessions.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(engines.router, prefix="/api")
 app.include_router(skills.router, prefix="/api")
+app.include_router(stock.router, prefix="/api")
 
 
 @app.get("/api/health")
