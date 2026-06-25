@@ -28,7 +28,11 @@ async def list_sessions() -> List[ChatSession]:
         try:
             async with aiofiles.open(f, "r", encoding="utf-8") as fp:
                 content = await fp.read()
-                sessions.append(ChatSession(**json.loads(content)))
+                data = json.loads(content)
+                # 兼容旧数据：没有 type 字段的默认为 "chat"
+                if "type" not in data:
+                    data["type"] = "chat"
+                sessions.append(ChatSession(**data))
         except Exception:
             pass
     sessions.sort(key=lambda s: s.updatedAt, reverse=True)
@@ -42,7 +46,10 @@ async def get_session(session_id: str) -> Optional[ChatSession]:
     try:
         async with aiofiles.open(path, "r", encoding="utf-8") as fp:
             content = await fp.read()
-            return ChatSession(**json.loads(content))
+            data = json.loads(content)
+            if "type" not in data:
+                data["type"] = "chat"
+            return ChatSession(**data)
     except Exception:
         return None
 
