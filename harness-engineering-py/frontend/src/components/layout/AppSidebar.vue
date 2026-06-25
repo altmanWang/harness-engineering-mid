@@ -26,6 +26,15 @@
         <el-icon><Service /></el-icon>
         <span v-if="!isCollapsed">Agents</span>
       </div>
+      <div
+        class="nav-item"
+        :class="{ active: activeRoute === '/stock' }"
+        index="/stock"
+        @click="go('/stock')"
+      >
+        <el-icon><TrendCharts /></el-icon>
+        <span v-if="!isCollapsed">Stock</span>
+      </div>
     </nav>
 
     <section class="history-section" aria-label="历史会话">
@@ -34,14 +43,25 @@
           <el-icon><Clock /></el-icon>
           <span v-if="!isCollapsed">历史会话</span>
         </div>
-        <el-button
-          v-if="!isCollapsed"
-          :icon="Plus"
-          size="small"
-          text
-          circle
-          @click="handleNewSession"
-        />
+        <div class="history-actions">
+          <el-button
+            v-if="!isCollapsed && selectedSessionIds.length >= 2"
+            size="small"
+            text
+            type="primary"
+            @click="handleCompare"
+          >
+            对比 ({{ selectedSessionIds.length }})
+          </el-button>
+          <el-button
+            v-if="!isCollapsed"
+            :icon="Plus"
+            size="small"
+            text
+            circle
+            @click="handleNewSession"
+          />
+        </div>
       </div>
 
       <div v-if="!isCollapsed" class="history-list">
@@ -53,6 +73,17 @@
           :class="{ active: session.id === chatStore.currentSessionId }"
           @click="handleSelectSession(session.id)"
         >
+          <el-checkbox
+            v-if="session.type === 'stock_diagnosis'"
+            :model-value="selectedSessionIds.includes(session.id)"
+            size="small"
+            @click.stop
+            @change="toggleSelectSession(session.id)"
+          />
+          <el-icon size="14" class="history-type-icon">
+            <TrendCharts v-if="session.type === 'stock_diagnosis'" />
+            <ChatDotSquare v-else />
+          </el-icon>
           <span class="history-name">{{ session.title || '新会话' }}</span>
           <el-button
             class="history-delete"
@@ -97,7 +128,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Clock, Delete, Expand, Fold, MagicStick, Moon, Plus, Service, Sunny } from '@element-plus/icons-vue'
+import { ChatDotSquare, Clock, Delete, Expand, Fold, MagicStick, Moon, Plus, Service, Sunny, TrendCharts } from '@element-plus/icons-vue'
 import { useChatStore } from '@/stores/chat'
 import { useEngineStore } from '@/stores/engine'
 import EngineInfo from '@/components/workflow/EngineInfo.vue'
@@ -114,6 +145,7 @@ const availableModels = ref<ModelInfo[]>([])
 const activeRoute = computed(() => {
   if (route.path.startsWith('/skills')) return '/skills'
   if (route.path.startsWith('/agents')) return '/agents'
+  if (route.path.startsWith('/stock')) return '/stock'
   return ''
 })
 
@@ -147,9 +179,31 @@ async function handleNewSession() {
   }
 }
 
+const selectedSessionIds = ref<string[]>([])
+
+function toggleSelectSession(id: string) {
+  const idx = selectedSessionIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedSessionIds.value.splice(idx, 1)
+  } else {
+    selectedSessionIds.value.push(id)
+  }
+}
+
+function handleCompare() {
+  if (selectedSessionIds.value.length >= 2) {
+    router.push(`/stock?compare=${selectedSessionIds.value.join(',')}`)
+  }
+}
+
 function handleSelectSession(id: string) {
   chatStore.selectSession(id)
-  router.push('/')
+  const session = chatStore.sessions.find(s => s.id === id)
+  if (session?.type === 'stock_diagnosis') {
+    router.push('/stock')
+  } else {
+    router.push('/')
+  }
 }
 
 async function handleDeleteSession(id: string) {
@@ -290,6 +344,15 @@ function toggleTheme() {
 }
 .history-item:hover .history-delete {
   opacity: 1;
+}
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.history-type-icon {
+  flex-shrink: 0;
+  color: var(--el-text-color-secondary);
 }
 .history-empty {
   padding: 12px 10px;
