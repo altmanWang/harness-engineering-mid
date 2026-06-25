@@ -29,7 +29,7 @@
 
       <el-empty
         v-else-if="!isAnalyzing"
-        description="输入股票代码，点击"开始诊股"开始分析"
+        description="输入股票代码，点击「开始诊股」开始分析"
       />
     </template>
 
@@ -51,6 +51,7 @@ import StockResultTable from '@/components/stock/StockResultTable.vue'
 import StockCompare from '@/components/stock/StockCompare.vue'
 import { useStockAnalysis } from '@/composables/useStockAnalysis'
 import type { Skill } from '@/types'
+import type { StockItem } from '@/composables/useStockAnalysis'
 import type { ChatSession } from '@/types/chat'
 
 const route = useRoute()
@@ -117,7 +118,7 @@ function loadViewingRecord() {
       if (result) {
         return {
           code,
-          status: (result.conclusion ? 'done' : 'error') as const,
+          status: (result.conclusion ? 'done' : 'error') as StockItem['status'],
           result: result.conclusion ? result : null,
           error: result.error || null,
         }
