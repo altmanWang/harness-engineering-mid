@@ -35,13 +35,37 @@ class ChatMessage(BaseModel):
     isStreaming: Optional[bool] = None
 
 
+class DiagnosisResult(BaseModel):
+    code: str
+    name: str = ""
+    conclusion: Optional[str] = None  # "看多" | "看空" | "观望" | None(失败)
+    reason: str = ""
+    close: Optional[float] = None
+    open: Optional[float] = None
+    pct_chg: Optional[float] = None
+    ema20: Optional[float] = None
+    error: Optional[str] = None
+    source: Optional[str] = None
+
+
+class StockDiagnosis(BaseModel):
+    codes: List[str] = []
+    days: int = 90
+    skills: List[str] = []
+    results: List[DiagnosisResult] = []
+    successCount: int = 0
+    failedCount: int = 0
+
+
 class ChatSession(BaseModel):
     id: str
+    type: str = "chat"  # "chat" | "stock_diagnosis"
     title: str
     engine: str
     model: str
     agentSessionId: Optional[str] = None
     messages: List[ChatMessage] = []
+    diagnosis: Optional[StockDiagnosis] = None  # 仅 stock_diagnosis 类型
     createdAt: str
     updatedAt: str
 
@@ -80,6 +104,13 @@ class DeleteSessionRequest(BaseModel):
 class ResolvePermissionRequest(BaseModel):
     requestId: str
     optionId: str
+
+
+class StockAnalyzeRequest(BaseModel):
+    codes: List[str]
+    days: int = 90
+    skills: List[str] = []
+    sessionId: Optional[str] = None
 
 
 class StreamState:
