@@ -1,3 +1,5 @@
+import type { StockDiagnosis } from './stock'
+
 export interface PermissionOption {
   id: string
   label: string
@@ -33,11 +35,13 @@ export interface ChatMessage {
 
 export interface ChatSession {
   id: string
+  type: "chat" | "stock_diagnosis"
   title: string
   engine: string
   model: string
   agentSessionId?: string
   messages: ChatMessage[]
+  diagnosis?: StockDiagnosis
   createdAt: string
   updatedAt: string
 }
