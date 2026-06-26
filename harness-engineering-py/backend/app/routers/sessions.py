@@ -29,7 +29,7 @@ async def create_session(body: CreateSessionRequest):
         id=_gen_id("session"),
         title="",
         engine=body.engine or "opencode",
-        model=body.model or "claude-sonnet-4-6",
+        model=body.model or "",
         messages=[],
         createdAt=now,
         updatedAt=now,

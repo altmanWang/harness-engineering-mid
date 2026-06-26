@@ -9,13 +9,27 @@ export interface DiagnosisResult {
   ema20: number | null
   error?: string
   source?: string
+  klinePath?: string
 }
 
 export interface StockDiagnosis {
   codes: string[]
+  sector?: string
   days: number
   skills: string[]
   results: DiagnosisResult[]
   successCount: number
   failedCount: number
+}
+
+export interface SectorInfo {
+  code: string
+  name: string
+  type?: string  // "行业" | "概念"
+}
+
+export interface StockSearchResult {
+  code: string
+  name: string
+  type: string
 }

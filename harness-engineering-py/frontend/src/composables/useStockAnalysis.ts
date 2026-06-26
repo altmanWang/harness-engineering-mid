@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { useChatStore } from '@/stores/chat'
 import type { DiagnosisResult } from '@/types/stock'
 
 export interface StockItem {
@@ -13,6 +14,8 @@ export function useStockAnalysis() {
   const isAnalyzing = ref(false)
   const analysisId = ref<string | null>(null)
   const sessionId = ref<string | null>(null)
+  const totalCount = ref(0)
+  const completedCount = ref(0)
 
   let eventSource: EventSource | null = null
 
@@ -30,11 +33,13 @@ export function useStockAnalysis() {
     if (item) item.status = status
   }
 
-  async function startAnalysis(codes: string[], days: number, skills: string[], existingSessionId?: string) {
+  async function startAnalysis(codes: string[], days: number, skills: string[], existingSessionId?: string, model?: string) {
     if (isAnalyzing.value) return
 
     initItems(codes)
     isAnalyzing.value = true
+    totalCount.value = codes.length
+    completedCount.value = 0
 
     try {
       const res = await fetch('/api/stock/analyze', {
@@ -45,6 +50,7 @@ export function useStockAnalysis() {
           days,
           skills,
           sessionId: existingSessionId || undefined,
+          model: model || undefined,
         }),
       })
 
@@ -62,6 +68,7 @@ export function useStockAnalysis() {
 
       es.addEventListener('start', (e) => {
         const data = JSON.parse(e.data)
+        totalCount.value = data.total || codes.length
         if (data.codes && data.codes.length > 0) {
           setItemStatus(data.codes[0], 'analyzing')
         }
@@ -74,6 +81,7 @@ export function useStockAnalysis() {
           item.status = 'done'
           item.result = data
         }
+        completedCount.value++
         const nextPending = items.value.find(i => i.status === 'pending')
         if (nextPending) {
           nextPending.status = 'analyzing'
@@ -87,6 +95,7 @@ export function useStockAnalysis() {
           item.status = 'error'
           item.error = data.error || '未知错误'
         }
+        completedCount.value++
         const nextPending = items.value.find(i => i.status === 'pending')
         if (nextPending) {
           nextPending.status = 'analyzing'
@@ -125,6 +134,8 @@ export function useStockAnalysis() {
     isAnalyzing,
     analysisId,
     sessionId,
+    totalCount,
+    completedCount,
     startAnalysis,
     cancelAnalysis,
   }

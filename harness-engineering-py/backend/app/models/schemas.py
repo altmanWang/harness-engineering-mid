@@ -46,10 +46,12 @@ class DiagnosisResult(BaseModel):
     ema20: Optional[float] = None
     error: Optional[str] = None
     source: Optional[str] = None
+    klinePath: Optional[str] = None  # K 线 CSV 文件路径（相对 session 目录）
 
 
 class StockDiagnosis(BaseModel):
     codes: List[str] = []
+    sector: Optional[str] = None  # 板块代码（如果是按板块分析）
     days: int = 90
     skills: List[str] = []
     results: List[DiagnosisResult] = []
@@ -107,10 +109,12 @@ class ResolvePermissionRequest(BaseModel):
 
 
 class StockAnalyzeRequest(BaseModel):
-    codes: List[str]
+    codes: List[str] = []
+    sector: Optional[str] = None  # 板块代码，如 BK1036（与 codes 互斥，优先 sector）
     days: int = 90
     skills: List[str] = []
     sessionId: Optional[str] = None
+    model: Optional[str] = None  # 不填则使用 opencode 默认模型
 
 
 class StreamState:

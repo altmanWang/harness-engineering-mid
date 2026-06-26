@@ -83,9 +83,9 @@ class OpenCodeEngineWrapper(Engine):
             except Exception as err:
                 self._emit("stream", EngineStreamEvent(
                     type="error",
-                    content=f"Model unavailable: {err}",
+                    content=f"Model '{model}' unavailable, using default",
                 ))
-                return {"success": False, "output": "", "error": str(err)}
+                # Don't fail — let opencode use its default model
 
         self._streaming = True
         try:

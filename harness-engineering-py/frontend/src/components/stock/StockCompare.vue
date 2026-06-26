@@ -92,6 +92,6 @@ function conclusionTagType(c: string | null): 'success' | 'danger' | 'warning' |
   border-bottom: 1px solid var(--el-border-color-extra-light);
 }
 .highlight-change {
-  box-shadow: 0 0 0 2px #e6a23c;
+  box-shadow: 0 0 0 2px var(--el-color-warning);
 }
 </style>

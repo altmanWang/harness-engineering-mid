@@ -8,7 +8,7 @@ export const useChatStore = defineStore('chat', () => {
   const messages = ref<ChatMessage[]>([])
   const isStreaming = ref(false)
   const pendingPermission = ref<PermissionRequest | null>(null)
-  const model = ref('claude-sonnet-4-6')
+  const model = ref('')
   const agentSessionId = ref<string | undefined>(undefined)
 
   function setSessions(list: ChatSession[]) {

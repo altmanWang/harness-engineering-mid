@@ -158,6 +158,10 @@ onMounted(async () => {
   await engineStore.fetchAvailability()
   if (engineStore.engineInfo) {
     availableModels.value = engineStore.engineInfo.models || []
+    // 初始模型跟随引擎默认配置
+    if (!chatStore.model && engineStore.engineInfo.defaultModel) {
+      chatStore.setModel(engineStore.engineInfo.defaultModel)
+    }
   }
 })
 

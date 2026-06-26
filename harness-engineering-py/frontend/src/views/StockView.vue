@@ -27,6 +27,16 @@
         :items="items"
       />
 
+      <!-- 分析进度条 -->
+      <div v-if="isAnalyzing" class="analysis-progress">
+        <el-progress
+          :percentage="totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0"
+          :stroke-width="6"
+          :show-text="false"
+        />
+        <span class="progress-text">正在分析第 {{ completedCount + 1 > totalCount ? totalCount : completedCount + 1 }}/{{ totalCount }} 只</span>
+      </div>
+
       <el-empty
         v-else-if="!isAnalyzing"
         description="输入股票代码，点击「开始诊股」开始分析"
@@ -45,6 +55,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useChatStore } from '@/stores/chat'
 import StockInput from '@/components/stock/StockInput.vue'
 import StockResultTable from '@/components/stock/StockResultTable.vue'
@@ -58,7 +69,7 @@ const route = useRoute()
 const router = useRouter()
 const chatStore = useChatStore()
 
-const { items, isAnalyzing, startAnalysis } = useStockAnalysis()
+const { items, isAnalyzing, totalCount, completedCount, startAnalysis } = useStockAnalysis()
 
 const codes = ref<string[]>([])
 const days = ref(90)
@@ -132,10 +143,10 @@ async function handleStart() {
   viewingRecord.value = null
   loadedSessionId.value = null
   try {
-    await startAnalysis(codes.value, days.value, selectedSkills.value)
+    await startAnalysis(codes.value, days.value, selectedSkills.value, undefined, chatStore.model || undefined)
     await chatStore.loadSessions()
   } catch (err: any) {
-    console.error('Analysis failed:', err)
+    ElMessage.error(err?.message || '分析启动失败，请重试')
   }
 }
 
@@ -192,5 +203,23 @@ async function handleAskAI() {
 .record-time {
   font-size: 13px;
   color: var(--el-text-color-placeholder);
+}
+.analysis-progress {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--el-bg-color);
+  border-radius: 8px;
+  border: 1px solid var(--el-border-color-light);
+}
+.analysis-progress .el-progress {
+  flex: 1;
+}
+.progress-text {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="stock-table-wrap">
-    <el-table :data="items" stripe style="width: 100%" max-height="520">
-      <el-table-column prop="code" label="代码" width="110">
+    <el-table :data="items" stripe style="width: 100%" max-height="520" aria-label="诊股分析结果">
+      <el-table-column prop="code" label="代码" width="110" sortable>
         <template #default="{ row }">
           <span class="code-font">{{ row.code }}</span>
         </template>
@@ -31,6 +31,11 @@
               :type="conclusionTagType(row.result.conclusion)"
               size="small"
             >
+              <el-icon style="margin-right: 2px; vertical-align: middle;">
+                <Top v-if="row.result.conclusion === '看多'" />
+                <Bottom v-else-if="row.result.conclusion === '看空'" />
+                <Minus v-else />
+              </el-icon>
               {{ row.result.conclusion || '—' }}
             </el-tag>
           </template>
@@ -46,7 +51,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="理由" min-width="200">
+      <el-table-column label="理由" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result">
             {{ row.result.reason }}
@@ -57,7 +62,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="收盘" width="80" align="right">
+      <el-table-column label="收盘" width="80" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.close !== null">
             {{ row.result.close.toFixed(2) }}
@@ -73,7 +78,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="涨跌" width="80" align="right">
+      <el-table-column label="涨跌" width="80" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.pct_chg !== null">
             <span :class="(row.result.pct_chg ?? 0) >= 0 ? 'text-green' : 'text-red'">
@@ -83,7 +88,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="EMA20" width="80" align="right">
+      <el-table-column label="EMA20" width="80" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.ema20 !== null">
             {{ row.result.ema20.toFixed(2) }}
@@ -108,6 +113,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Top, Bottom, Minus } from '@element-plus/icons-vue'
 import type { StockItem } from '@/composables/useStockAnalysis'
 
 const props = defineProps<{
@@ -128,7 +134,7 @@ function conclusionTagType(conclusion: string | null): 'success' | 'danger' | 'w
 
 <style scoped>
 .stock-table-wrap {
-  background: #fff;
+  background: var(--el-bg-color);
   border-radius: 8px;
   border: 1px solid var(--el-border-color-light);
   overflow: hidden;
@@ -137,10 +143,10 @@ function conclusionTagType(conclusion: string | null): 'success' | 'danger' | 'w
   font-family: monospace;
   font-weight: 600;
 }
-.text-muted { color: var(--el-text-color-placeholder); }
-.text-green { color: #67c23a; font-weight: 600; }
-.text-red { color: #f56c6c; font-weight: 600; }
-.text-danger { color: #f56c6c; }
+.text-muted { color: var(--el-text-color-secondary); }
+.text-green { color: var(--el-color-success); font-weight: 600; }
+.text-red { color: var(--el-color-danger); font-weight: 600; }
+.text-danger { color: var(--el-color-danger); }
 .table-footer {
   display: flex;
   gap: 20px;

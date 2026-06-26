@@ -7,3 +7,7 @@ harness-engineering/.next/
 harness-engineering-py/frontend/node_modules/
 ACEHarness-main
 .worktrees/
+harness-engineering-py/backend/data/
+docs/superpowers
+.claude/
+.superpowers/

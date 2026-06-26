@@ -17,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const displayModelName = computed(() => {
+  if (!props.modelName) return '默认'
   if (props.models && props.models.length > 0) {
     const found = props.models.find(m => m.id === props.modelName)
     if (found) return found.name
