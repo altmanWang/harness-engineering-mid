@@ -270,6 +270,8 @@ async def _run_analysis(
     results: list = []
     success_count = 0
     failed_count = 0
+    first_prompt = ""  # 第一条股票的实际 prompt，存到 session 方便调试
+    agent_session_id: Optional[str] = None  # OpenCode agent session ID，存到 session 方便调试
 
     for code in codes:
         try:
@@ -296,6 +298,8 @@ async def _run_analysis(
 
             kline_text = _df_to_text(df)
             prompt = _build_prompt(code, name, kline_text, skill_names)
+            if not first_prompt:
+                first_prompt = prompt
 
             collected = []
 
@@ -309,10 +313,16 @@ async def _run_analysis(
                     "prompt": prompt,
                     "model": model,
                     "workingDirectory": worktree_dir,
-                    "sessionId": None,
+                    "sessionId": agent_session_id,
                 })
             finally:
                 engine.off("stream", on_text)
+
+            # 首次执行时捕获 OpenCode agent session ID 并持久化
+            if not agent_session_id and result and result.get("sessionId"):
+                agent_session_id = result["sessionId"]
+                session.agentSessionId = agent_session_id
+                await save_session(session)
 
             output = result.get("output", "") if result else ""
             if not output:
@@ -359,6 +369,8 @@ async def _run_analysis(
         sector=sector or None,
         days=days,
         skills=skills,
+        skillNames=skill_names,
+        initialPrompt=first_prompt,
         results=results,
         successCount=success_count,
         failedCount=failed_count,

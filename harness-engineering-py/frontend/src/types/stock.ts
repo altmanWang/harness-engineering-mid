@@ -17,6 +17,8 @@ export interface StockDiagnosis {
   sector?: string
   days: number
   skills: string[]
+  skillNames: string[]
+  initialPrompt: string
   results: DiagnosisResult[]
   successCount: number
   failedCount: number
