@@ -10,6 +10,7 @@ export interface DiagnosisResult {
   error?: string
   source?: string
   klinePath?: string
+  klineDate?: string
 }
 
 export interface StockDiagnosis {

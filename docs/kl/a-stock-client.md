@@ -2,11 +2,11 @@
 
 ## 文件位置
 
-`backend/a_stock_client/`
+`backend/a_stock_client/` (相对于后端启动目录 `harness-engineering-py/`)
 
 ## 概述
 
-**独立可复用**的 A 股（及跨市场）K 线数据获取模块，当前**未集成到 API**，仅作为 Python 库和 CLI 工具使用。
+独立可复用的 A 股（及跨市场）K 线数据获取模块，**已通过 `app/routers/stock.py` 集成到 API**，在股票诊股流程中自动调用 `AStockClient.get_kline()` 获取 K 线数据。
 
 ## 目录结构
 

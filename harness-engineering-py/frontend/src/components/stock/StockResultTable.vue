@@ -95,6 +95,28 @@
           </template>
         </template>
       </el-table-column>
+
+      <el-table-column label="K线日期" width="110" align="center">
+        <template #default="{ row }">
+          <template v-if="row.status === 'done' && row.result && row.result.klineDate">
+            {{ row.result.klineDate }}
+          </template>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="90" align="center" fixed="right">
+        <template #default="{ row }">
+          <el-button
+            v-if="row.status === 'done' && row.result"
+            type="primary"
+            link
+            size="small"
+            @click="openKLine(row)"
+          >
+            详情
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <div class="table-footer">
@@ -108,17 +130,38 @@
         等待 <strong class="text-muted">{{ pendingCount }}</strong>
       </span>
     </div>
+
+    <KLineChart
+      v-model="klineVisible"
+      :code="klineCode"
+      :stock-name="klineName"
+      :session-id="sessionId || ''"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Top, Bottom, Minus } from '@element-plus/icons-vue'
 import type { StockItem } from '@/composables/useStockAnalysis'
+import KLineChart from '@/components/stock/KLineChart.vue'
 
 const props = defineProps<{
   items: StockItem[]
+  sessionId?: string
 }>()
+
+// K线图弹窗状态
+const klineVisible = ref(false)
+const klineCode = ref('')
+const klineName = ref('')
+
+function openKLine(row: StockItem) {
+  if (!row.result) return
+  klineCode.value = row.result.code
+  klineName.value = row.result.name || row.result.code
+  klineVisible.value = true
+}
 
 const successCount = computed(() => props.items.filter(i => i.status === 'done').length)
 const failedCount = computed(() => props.items.filter(i => i.status === 'error').length)

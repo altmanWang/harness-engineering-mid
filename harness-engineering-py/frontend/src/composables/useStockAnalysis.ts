@@ -12,6 +12,8 @@ export interface StockItem {
 export function useStockAnalysis() {
   const items = ref<StockItem[]>([])
   const isAnalyzing = ref(false)
+  const isSuppressed = ref(false)
+  const suppressedSnapshot = ref<StockItem[] | null>(null)
   const analysisId = ref<string | null>(null)
   const sessionId = ref<string | null>(null)
   const totalCount = ref(0)
@@ -29,8 +31,24 @@ export function useStockAnalysis() {
   }
 
   function setItemStatus(code: string, status: StockItem['status']) {
+    if (isSuppressed.value) return
     const item = items.value.find(i => i.code === code)
     if (item) item.status = status
+  }
+
+  /** 抑制 SSE 更新（切换到历史会话时），保存当前快照以便恢复 */
+  function suppress() {
+    suppressedSnapshot.value = items.value.map(i => ({ ...i }))
+    isSuppressed.value = true
+  }
+
+  /** 恢复 SSE 更新（切回运行中会话时），从快照恢复 items */
+  function resume() {
+    isSuppressed.value = false
+    if (suppressedSnapshot.value) {
+      items.value = suppressedSnapshot.value
+      suppressedSnapshot.value = null
+    }
   }
 
   async function startAnalysis(codes: string[], days: number, skills: string[], existingSessionId?: string, model?: string) {
@@ -38,6 +56,8 @@ export function useStockAnalysis() {
 
     initItems(codes)
     isAnalyzing.value = true
+    isSuppressed.value = false
+    suppressedSnapshot.value = null
     totalCount.value = codes.length
     completedCount.value = 0
 
@@ -67,6 +87,7 @@ export function useStockAnalysis() {
       eventSource = es
 
       es.addEventListener('start', (e) => {
+        if (isSuppressed.value) return
         const data = JSON.parse(e.data)
         totalCount.value = data.total || codes.length
         if (data.codes && data.codes.length > 0) {
@@ -75,6 +96,7 @@ export function useStockAnalysis() {
       })
 
       es.addEventListener('stock_result', (e) => {
+        if (isSuppressed.value) return
         const data = JSON.parse(e.data) as DiagnosisResult
         const item = items.value.find(i => i.code === data.code)
         if (item) {
@@ -89,6 +111,7 @@ export function useStockAnalysis() {
       })
 
       es.addEventListener('stock_error', (e) => {
+        if (isSuppressed.value) return
         const data = JSON.parse(e.data)
         const item = items.value.find(i => i.code === data.code)
         if (item) {
@@ -127,16 +150,21 @@ export function useStockAnalysis() {
       eventSource = null
     }
     isAnalyzing.value = false
+    isSuppressed.value = false
+    suppressedSnapshot.value = null
   }
 
   return {
     items,
     isAnalyzing,
+    isSuppressed,
     analysisId,
     sessionId,
     totalCount,
     completedCount,
     startAnalysis,
     cancelAnalysis,
+    suppress,
+    resume,
   }
 }

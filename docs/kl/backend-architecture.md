@@ -22,7 +22,8 @@ backend/
 │   │   ├── chat.py                # SSE 流式聊天 + 权限处理
 │   │   ├── sessions.py            # 会话 CRUD
 │   │   ├── engines.py             # 引擎可用性检测
-│   │   └── skills.py              # Skill 上传/下载/加载
+│   │   ├── skills.py              # Skill 上传/下载/加载
+│   │   └── stock.py               # 智能诊股 SSE + 板块查询 + K线服务
 │   └── services/
 │       ├── engine_interface.py    # Engine 抽象基类
 │       ├── opencode_wrapper.py    # Engine 接口实现
@@ -37,7 +38,7 @@ backend/
 │   ├── chat-sessions/             # 会话 JSON 文件
 │   ├── skills/                    # Skill ZIP + metadata.json
 │   └── worktrees/                 # 每会话隔离目录
-├── a_stock_client/                # 独立 A 股 K 线库 (未 API 集成)
+├── a_stock_client/                # 独立 A 股 K 线库 (stock.py 路由已集成)
 └── tests/
     └── test_acp_engine.py
 ```
@@ -60,6 +61,12 @@ backend/
 | `GET` | `/api/skills/{id}/download` | skills | 下载 Skill ZIP |
 | `DELETE` | `/api/skills/{id}` | skills | 删除 Skill |
 | `POST` | `/api/skills/{id}/load` | skills | 加载 Skill 到 worktree |
+| `POST` | `/api/stock/analyze` | stock | 启动诊股 (SSE) |
+| `GET` | `/api/stock/stream` | stock | 诊股 SSE 流 (analysisId=) |
+| `GET` | `/api/stock/sectors` | stock | 板块列表 |
+| `GET` | `/api/stock/sectors/{code}/stocks` | stock | 板块成分股 |
+| `GET` | `/api/stock/search` | stock | 股票搜索 (westock-data) |
+| `GET` | `/api/stock/kline/{sessionId}/{code}` | stock | K 线 CSV 数据 |
 
 ## 引擎通信层
 
@@ -82,6 +89,10 @@ Engine (ABC)                          ← 抽象接口
 | `EngineAvailability` | available, name, version, models[], defaultModel |
 | `ModelInfo` | id, name |
 | `SendMessageRequest` | message, model, sessionId, agentSessionId? |
+| `StockAnalyzeRequest` | codes[], sector?, days, skills[], sessionId?, model? |
+| `StockDiagnosis` | codes[], sector?, days, skills[], skillNames[], initialPrompt, results[], successCount, failedCount |
+| `DiagnosisResult` | code, name, conclusion?, reason, close?, open?, pct_chg?, ema20?, error?, source?, klinePath?, klineDate? |
+| `StreamState` | chat_id, frontend_session_id, engine, stream_content, status |
 
 ## 核心服务
 
@@ -99,5 +110,5 @@ Engine (ABC)                          ← 抽象接口
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 ```

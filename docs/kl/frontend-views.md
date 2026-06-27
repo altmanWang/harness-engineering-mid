@@ -80,3 +80,55 @@ Agent 市场页面，结构类似 SkillsView:
 - 数据源: `@/mock/data.ts` (静态 mock 数据, **非 API**)
 - 筛选: 使用 `useMarketFilter` composable
 - 无 CRUD 操作 (只读展示)
+
+---
+
+## StockView (`views/StockView.vue`)
+
+智能诊股页面，结构:
+
+```
+┌──────────────────────────────────────────────────┐
+│ 智能诊股                                         │
+├──────────────────────────────────────────────────┤
+│ [StockInput: 搜索 + 手动代码输入 + 天数 + Skills] │
+├──────────────────────────────────────────────────┤
+│ [进度条: 成功/失败/待分析统计]                    │
+├──────────────────────────────────────────────────┤
+│ [StockResultTable: 诊股结果表格]                  │
+│   - 代码/名称/结论(看多/看空/观望)/理由           │
+│   - 收盘价/开盘价/涨跌幅/EMA20                    │
+│   - K线日期/详情按钮                              │
+├──────────────────────────────────────────────────┤
+│ [追问 AI] 按钮                                   │
+└──────────────────────────────────────────────────┘
+```
+
+### 核心流程
+
+1. 用户通过 `StockInput` 搜索股票或手动输入代码
+2. 选择分析天数 (30/60/90/180) 和 Skills
+3. 点击"开始诊股" → `useStockAnalysis.startAnalysis()`
+4. POST `/api/stock/analyze` → 获取 `analysisId`
+5. EventSource GET `/api/stock/stream?analysisId=...` → 逐只推送 SSE 结果
+6. `StockResultTable` 实时更新每只股票的状态 (pending → analyzing → done/error)
+7. 点击详情 → `KLineChart` 弹窗显示 ECharts K 线图
+8. 对比模式: URL 参数 `?compare=id1,id2` → `StockCompare` 并排对比
+
+### 数据流
+
+```
+StockInput → useStockAnalysis.startAnalysis(codes, days, skills, sessionId)
+  → POST /api/stock/analyze → { analysisId, sessionId }
+  → EventSource GET /api/stock/stream?analysisId=...
+    → SSE events: start → stock_result → stock_error → done
+      → stockItems ref 实时更新 → StockResultTable 渲染
+```
+
+### 关键 Composable: `useStockAnalysis`
+
+- `stockItems`: `Ref<StockItem[]>` — 每只股票的分析状态
+- `startAnalysis(codes, days, skills, sessionId)` — 发起诊股
+- `suppress(sessionId)` — 暂停实时 SSE（切换到历史 session）
+- `resume(sessionId)` — 恢复实时 SSE（切换回活跃 session）
+- 用于 StockView 和 AppSidebar 对比模式的 session 切换

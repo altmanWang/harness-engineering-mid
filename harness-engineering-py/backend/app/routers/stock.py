@@ -330,6 +330,10 @@ async def _run_analysis(
 
             parsed = _parse_conclusion(output)
 
+            kline_date = str(last_row.get("date", ""))
+            if hasattr(kline_date, "strftime"):
+                kline_date = kline_date.strftime("%Y-%m-%d")
+
             diagnosis_result = DiagnosisResult(
                 code=code,
                 name=name,
@@ -341,6 +345,7 @@ async def _run_analysis(
                 ema20=ema20_val,
                 source=source,
                 klinePath=kline_rel_path,
+                klineDate=kline_date,
             )
             results.append(diagnosis_result)
             success_count += 1
@@ -631,6 +636,72 @@ async def _search_sector_with_fallback(keyword: str) -> list[dict]:
                 logger.info(f"Sector search fallback: '{keyword}' -> '{candidate}', found {len(sector_codes)} sectors")
             return sector_codes
     return []
+
+
+@router.get("/stock/kline/{session_id}/{code}")
+async def get_kline_data(session_id: str, code: str):
+    """读取 session worktree 中的 K 线 CSV，返回 ECharts 可用格式."""
+    import csv
+    from pathlib import Path
+
+    kline_dir = WORKTREES_DIR / session_id / "kline"
+    if not kline_dir.exists():
+        raise HTTPException(status_code=404, detail=f"K-line dir not found for session {session_id}")
+
+    # 查找匹配的 CSV 文件: {code}_{start}_{end}.csv
+    csv_files = sorted(kline_dir.glob(f"{code}_*.csv"))
+    if not csv_files:
+        raise HTTPException(status_code=404, detail=f"No K-line file for {code} in session {session_id}")
+
+    csv_path = csv_files[0]
+    rows: list[dict] = []
+    kline_date = ""
+    name = code
+
+    try:
+        with open(csv_path, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                date_val = (row.get("date") or "").strip()
+                try:
+                    open_val = float(row.get("open", 0) or 0)
+                    close_val = float(row.get("close", 0) or 0)
+                    high_val = float(row.get("high", 0) or 0)
+                    low_val = float(row.get("low", 0) or 0)
+                    volume_val = float(row.get("volume", 0) or 0)
+                    ema20_val = float(row.get("ma20", 0) or 0)
+                except (ValueError, TypeError):
+                    continue
+
+                rows.append({
+                    "date": date_val,
+                    "open": round(open_val, 2),
+                    "close": round(close_val, 2),
+                    "high": round(high_val, 2),
+                    "low": round(low_val, 2),
+                    "volume": int(volume_val),
+                    "ema20": round(ema20_val, 2),
+                })
+
+                if date_val:
+                    kline_date = date_val
+
+                # 从 CSV 中取股票名称
+                row_name = (row.get("name") or "").strip()
+                if row_name and name == code:
+                    name = row_name
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read K-line CSV: {e}")
+
+    if not rows:
+        raise HTTPException(status_code=404, detail="K-line CSV is empty")
+
+    return {
+        "code": code,
+        "name": name,
+        "klineDate": kline_date,
+        "data": rows,
+    }
 
 
 def _parse_search_table(text: str) -> list[dict]:

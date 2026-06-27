@@ -47,6 +47,7 @@ class DiagnosisResult(BaseModel):
     error: Optional[str] = None
     source: Optional[str] = None
     klinePath: Optional[str] = None  # K 线 CSV 文件路径（相对 session 目录）
+    klineDate: Optional[str] = None  # 最近一根 K 线日期
 
 
 class StockDiagnosis(BaseModel):

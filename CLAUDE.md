@@ -9,10 +9,10 @@
 ```bash
 cd harness-engineering-py/backend
 pip install -r requirements.txt    # 安装 Python 依赖
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-- 默认端口 **8000**，API 文档自动生成在 http://localhost:8000/docs
+- 默认端口 **8000**，API 文档自动生成在 http://localhost:8080/docs
 - 依赖系统已安装 `opencode` CLI，后端通过 ACP 协议与 OpenCode 子进程通信
 - 会话数据存储在 `./data/chat-sessions/`（相对于后端启动目录）
 - 无 `.env` 文件，无需环境变量配置

@@ -1,6 +1,6 @@
 # Harness Engineering — Knowledge Base Index
 
-> 生成时间: 2026-06-25 | 基于代码实际状态
+> 生成时间: 2026-06-28 | 基于代码实际状态
 
 ---
 
@@ -17,10 +17,10 @@
 |------|------|
 | [侧边栏 (AppSidebar)](frontend-sidebar.md) | 左侧导航栏结构、路由联动、历史会话列表、折叠逻辑 |
 | [聊天流 (Chat Stream)](frontend-chat-stream.md) | useChatStream composable、SSE 事件处理、消息生命周期 |
-| [视图层 (Views)](frontend-views.md) | HomeView / SkillsView / AgentsView 三个页面的结构与数据流 |
+| [视图层 (Views)](frontend-views.md) | HomeView / SkillsView / AgentsView / StockView 四个页面的结构与数据流 |
 | [状态管理 (Stores)](frontend-stores.md) | chatStore (Pinia)、engineStore 的 state/actions 定义 |
-| [类型定义 (Types)](frontend-types.md) | ChatMessage、ChatSession、Skill 等 TypeScript 接口 |
-| [组件清单](frontend-components.md) | 19 个 Vue 组件的分类、职责与依赖关系 |
+| [前端类型定义 (Types)](frontend-types.md) | ChatMessage、ChatSession、StockDiagnosis 等 TypeScript 接口 |
+| [组件清单](frontend-components.md) | 22 个 Vue 组件的分类、职责与依赖关系 |
 
 ## 后端模块
 
@@ -49,6 +49,14 @@
   │  SSE events: delta → thinking → permission_request → done/failed
   ▼
 消息持久化: data/chat-sessions/{sessionId}.json
+
+诊股流 (stock.py):
+  前端 → POST /api/stock/analyze { codes, days, skills, sessionId }
+    → AStockClient.get_kline() 获取 K 线
+    → engine.execute() 逐只调用 LLM 分析
+    → EventSource GET /api/stock/stream?analysisId=...
+    → SSE events: start → stock_result → stock_error → done
+    → 结果持久化到 session.diagnosis
 ```
 
 ## 关键约定
@@ -59,4 +67,4 @@
 - **引擎池 TTL**: 10 分钟未使用自动回收
 - **工作区隔离**: `data/worktrees/{sessionId}/.opencode/skills/`
 - **Skill 加载**: ZIP 解压到 worktree 目录，`.loaded` 标记文件防重复
-- **前端代理**: Vite dev server 代理 `/api` 到 `localhost:8000`
+- **前端代理**: Vite dev server 代理 `/api` 到 `localhost:8080`

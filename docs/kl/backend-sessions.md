@@ -45,6 +45,7 @@ msg-{unix_ms}
 ```json
 {
   "id": "session-1782307250728-p0gc9u",
+  "type": "chat",
   "title": "帮我分析一下贵州茅台",
   "engine": "opencode",
   "model": "claude-sonnet-4-6",
@@ -63,6 +64,7 @@ msg-{unix_ms}
       "timestamp": "2025-06-24T10:00:15+00:00"
     }
   ],
+  "diagnosis": null,
   "createdAt": "2025-06-24T10:00:00+00:00",
   "updatedAt": "2025-06-24T10:00:15+00:00"
 }

@@ -25,10 +25,11 @@
       <StockResultTable
         v-if="items.length > 0"
         :items="items"
+        :session-id="sessionId || loadedSessionId || ''"
       />
 
       <!-- 分析进度条 -->
-      <div v-if="isAnalyzing" class="analysis-progress">
+      <div v-if="isAnalyzing && !isSuppressed" class="analysis-progress">
         <el-progress
           :percentage="totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0"
           :stroke-width="6"
@@ -53,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useChatStore } from '@/stores/chat'
@@ -69,7 +70,7 @@ const route = useRoute()
 const router = useRouter()
 const chatStore = useChatStore()
 
-const { items, isAnalyzing, totalCount, completedCount, startAnalysis } = useStockAnalysis()
+const { items, isAnalyzing, isSuppressed, totalCount, completedCount, startAnalysis, cancelAnalysis, suppress, resume, sessionId } = useStockAnalysis()
 
 const codes = ref<string[]>([])
 const days = ref(90)
@@ -105,6 +106,12 @@ onMounted(async () => {
   loadViewingRecord()
 })
 
+onBeforeUnmount(() => {
+  if (isAnalyzing.value) {
+    cancelAnalysis()
+  }
+})
+
 watch(() => chatStore.currentSessionId, () => {
   loadViewingRecord()
 })
@@ -116,6 +123,11 @@ function loadViewingRecord() {
 
   const session = chatStore.sessions.find(s => s.id === sid)
   if (session && session.type === 'stock_diagnosis' && session.diagnosis) {
+    // 切换到已完成的历史会话：抑制 SSE 但不关闭连接
+    if (isAnalyzing.value && sessionId.value !== sid) {
+      suppress()
+    }
+
     viewingRecord.value = session
     loadedSessionId.value = sid
 
@@ -136,6 +148,11 @@ function loadViewingRecord() {
       }
       return { code, status: 'pending' as const, result: null, error: null }
     })
+  } else if (session && session.type === 'stock_diagnosis' && isAnalyzing.value && sessionId.value === sid) {
+    // 切回正在运行的 session：恢复 SSE 更新，从快照恢复
+    resume()
+    viewingRecord.value = null
+    loadedSessionId.value = sid
   }
 }
 
@@ -151,6 +168,9 @@ async function handleStart() {
 }
 
 function handleClear() {
+  if (isAnalyzing.value) {
+    cancelAnalysis()
+  }
   codes.value = []
   items.value = []
   viewingRecord.value = null

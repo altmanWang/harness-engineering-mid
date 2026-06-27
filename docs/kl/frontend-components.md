@@ -1,6 +1,6 @@
 # 前端 — 组件清单
 
-共 19 个 Vue 组件，按目录分类:
+共 22 个 Vue 组件，按目录分类:
 
 ## layout/ (布局)
 
@@ -40,6 +40,15 @@
 | `AgentCard` | `AgentCard.vue` | AgentsView | Agent 卡片: 名称/描述/标签/使用次数 |
 | `AgentFilter` | `AgentFilter.vue` | AgentsView | 标签多选 + 搜索框 |
 
+## stock/ (智能诊股)
+
+| 组件 | 文件 | 使用状态 | 职责 |
+|------|------|---------|------|
+| `StockInput` | `StockInput.vue` | StockView | 股票搜索、手动输入代码、天数选择、Skills 多选 |
+| `StockResultTable` | `StockResultTable.vue` | StockView | 诊股结果表格: 结论/价格/涨跌幅/详情，底部统计 |
+| `KLineChart` | `KLineChart.vue` | StockResultTable | ECharts K 线图弹窗: 蜡烛图 + EMA20 + 成交量 |
+| `StockCompare` | `StockCompare.vue` | StockView | 多会话诊股结果并排对比，高亮结论变化 |
+
 ## 组件依赖关系
 
 ```
@@ -68,4 +77,10 @@ SkillsView
 AgentsView
 ├── AgentFilter
 └── AgentCard
+
+StockView
+├── StockInput
+├── StockResultTable
+│   └── KLineChart
+└── StockCompare
 ```

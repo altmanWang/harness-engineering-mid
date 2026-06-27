@@ -18,21 +18,24 @@
 frontend/src/
 ├── App.vue                    # 根布局: AppSidebar + <router-view>
 ├── main.ts                    # createApp + router + pinia
-├── router/index.ts            # 路由定义 (3 条)
+├── router/index.ts            # 路由定义 (4 条)
 ├── stores/
 │   ├── chat.ts                # 会话 & 消息状态
 │   └── engine.ts              # 引擎可用性状态
 ├── composables/
 │   ├── useChatStream.ts       # SSE 流式聊天逻辑
-│   └── useMarketFilter.ts     # 搜索/标签过滤
+│   ├── useMarketFilter.ts     # 搜索/标签过滤
+│   └── useStockAnalysis.ts    # 股票诊股 SSE 逻辑
 ├── types/
 │   ├── index.ts               # Skill, Agent, MarketItem
-│   └── chat.ts                # ChatMessage, ChatSession, EngineAvailability
+│   ├── chat.ts                # ChatMessage, ChatSession, EngineAvailability
+│   └── stock.ts               # DiagnosisResult, StockDiagnosis, StockSearchResult
 ├── mock/data.ts               # Agents 静态 mock 数据
 ├── views/
 │   ├── HomeView.vue           # 首页 (LandingHero ↔ ChatLayout)
 │   ├── SkillsView.vue         # Skills 管理页
-│   └── AgentsView.vue         # Agents 市场页
+│   ├── AgentsView.vue         # Agents 市场页
+│   └── StockView.vue          # 智能诊股页
 └── components/
     ├── layout/
     │   ├── AppSidebar.vue     # 左侧边栏
@@ -56,6 +59,11 @@ frontend/src/
     └── agents/
         ├── AgentCard.vue      # Agent 卡片
         └── AgentFilter.vue    # Agent 筛选栏
+    └── stock/
+        ├── StockInput.vue     # 股票搜索/输入
+        ├── StockResultTable.vue # 诊股结果表格
+        ├── KLineChart.vue     # ECharts K 线图弹窗
+        └── StockCompare.vue   # 多会话对比
 ```
 
 ## 路由表
@@ -65,6 +73,7 @@ frontend/src/
 | `/` | Home | HomeView.vue (lazy) | 聊天首页 |
 | `/skills` | Skills | SkillsView.vue (lazy) | Skill 管理 |
 | `/agents` | Agents | AgentsView.vue (lazy) | Agent 市场 |
+| `/stock` | Stock | StockView.vue (lazy) | 智能诊股 |
 
 ## 布局 (App.vue)
 
@@ -100,6 +109,6 @@ User Input → ChatInput.vue
 ```bash
 cd frontend
 npm install        # node_modules ~700MB
-npm run dev        # 默认 :3000, 代理 /api → :8000
+npm run dev        # 默认 :3000, 代理 /api → :8080
 npm run build      # 生产构建
 ```

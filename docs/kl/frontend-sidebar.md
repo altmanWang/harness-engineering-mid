@@ -12,6 +12,7 @@
 ├─────────────────────┤
 │ ★ Skills            │  ← 导航: /skills
 │ ◆ Agents            │  ← 导航: /agents
+│ 📈 Stock            │  ← 导航: /stock
 ├─────────────────────┤
 │ 🕐 历史会话    [+]   │  ← 最近 8 条会话
 │  ├ 会话标题1    [×] │
@@ -32,6 +33,7 @@
 <nav class="sidebar-nav">
   <div class="nav-item" @click="go('/skills')"> ... </div>
   <div class="nav-item" @click="go('/agents')"> ... </div>
+  <div class="nav-item" @click="go('/stock')"> ... </div>
 </nav>
 ```
 
@@ -43,6 +45,7 @@
 const activeRoute = computed(() => {
   if (route.path.startsWith('/skills')) return '/skills'
   if (route.path.startsWith('/agents')) return '/agents'
+  if (route.path.startsWith('/stock')) return '/stock'
   return ''
 })
 ```
@@ -81,3 +84,4 @@ onMounted(async () => {
 - 历史列表: max-height 260px, overflow-y auto
 - 删除按钮: 默认 opacity 0, hover 时显示
 - 底部操作栏: border-top 分割线
+- 对比模式: 选中 2+ 个 session 复选框后显示对比按钮，跳转到 /stock?compare=id1,id2
