@@ -11,6 +11,8 @@ export interface DiagnosisResult {
   source?: string
   klinePath?: string
   klineDate?: string
+  backtestSummaryPath?: string
+  backtestBarsPath?: string
 }
 
 export interface StrategyConfigItem {
@@ -55,4 +57,31 @@ export interface StockSearchResult {
   code: string
   name: string
   type: string
+}
+
+export interface BacktestSummary {
+  code: string
+  total_trades: number
+  win_rate: number
+  total_return: number
+  max_drawdown: number
+  profit_factor: number
+  avg_win: number
+  avg_loss: number
+  sharpe_ratio: number
+  start_date: string
+  end_date: string
+  strategy: string
+}
+
+export interface BacktestBar {
+  date: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+  ema20?: number
+  ema60?: number
+  signal?: 'buy' | 'sell' | null
 }
