@@ -48,6 +48,32 @@ class DiagnosisResult(BaseModel):
     source: Optional[str] = None
     klinePath: Optional[str] = None  # K 线 CSV 文件路径（相对 session 目录）
     klineDate: Optional[str] = None  # 最近一根 K 线日期
+    backtestBarsPath: Optional[str] = None     # 回测 bars CSV 相对路径
+    backtestSummaryPath: Optional[str] = None  # 回测 summary JSON 相对路径
+
+
+class BacktestSummary(BaseModel):
+    stock_code: str
+    stock_name: str
+    initial_capital: float = 20000.0
+    final_capital: float = 0.0
+    total_return: float = 0.0       # 总收益率 (%)
+    max_drawdown: float = 0.0       # 最大回撤 (%)
+    win_rate: float = 0.0           # 胜率 (%)
+    trade_count: int = 0            # 交易次数
+
+
+class BacktestBar(BaseModel):
+    date: str
+    stock_name: str = ""
+    open: float = 0.0
+    close: float = 0.0
+    signal: Optional[str] = None    # "买入" | "卖出" | "持有" | "观望"
+    cost: Optional[float] = None
+    profit: Optional[float] = None
+    capital: float = 0.0
+    stop_loss: Optional[float] = None
+    target_price: Optional[float] = None
 
 
 class StockDiagnosis(BaseModel):
