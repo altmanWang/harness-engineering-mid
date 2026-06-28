@@ -49,7 +49,7 @@ def main() -> None:
         sys.exit(1)
 
     if args.mode == "backtest":
-        run_backtest(str(csv_path), output_path=args.output, plot=args.plot)
+        run_backtest(str(csv_path), output_dir=args.output, plot=args.plot)
     else:
         run_signal(str(csv_path))
 
