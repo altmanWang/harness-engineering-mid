@@ -24,45 +24,29 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="结论" width="90">
+      <el-table-column label="结论" width="100">
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result">
-            <el-tag
-              :type="conclusionTagType(row.result.conclusion)"
-              size="small"
+            <span
+              :class="['conclusion-badge', row.result.conclusion === '买入' ? 'conclusion-buy' : 'conclusion-wait']"
             >
-              <el-icon style="margin-right: 2px; vertical-align: middle;">
-                <Top v-if="row.result.conclusion === '看多'" />
-                <Bottom v-else-if="row.result.conclusion === '看空'" />
-                <Minus v-else />
-              </el-icon>
+              <span class="conclusion-dot" />
               {{ row.result.conclusion || '—' }}
-            </el-tag>
+            </span>
           </template>
           <template v-else-if="row.status === 'analyzing'">
-            <el-tag type="info" size="small">分析中</el-tag>
+            <span class="status-badge status-analyzing">分析中</span>
           </template>
           <template v-else-if="row.status === 'pending'">
-            <el-tag type="info" size="small">等待</el-tag>
+            <span class="status-badge status-pending">等待</span>
           </template>
           <template v-else>
-            <el-tag type="danger" size="small">失败</el-tag>
+            <span class="status-badge status-error">失败</span>
           </template>
         </template>
       </el-table-column>
 
-      <el-table-column label="理由" min-width="200" show-overflow-tooltip>
-        <template #default="{ row }">
-          <template v-if="row.status === 'done' && row.result">
-            {{ row.result.reason }}
-          </template>
-          <template v-else-if="row.status === 'error'">
-            <span class="text-danger">{{ row.error }}</span>
-          </template>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="收盘" width="80" align="right" sortable>
+      <el-table-column label="收盘" width="85" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.close !== null">
             {{ row.result.close.toFixed(2) }}
@@ -70,7 +54,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="开盘" width="80" align="right">
+      <el-table-column label="开盘" width="85" align="right">
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.open !== null">
             {{ row.result.open.toFixed(2) }}
@@ -78,7 +62,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="涨跌" width="80" align="right" sortable>
+      <el-table-column label="涨跌" width="90" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.pct_chg !== null">
             <span :class="(row.result.pct_chg ?? 0) >= 0 ? 'text-green' : 'text-red'">
@@ -88,7 +72,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="EMA20" width="80" align="right" sortable>
+      <el-table-column label="EMA20" width="85" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.ema20 !== null">
             {{ row.result.ema20.toFixed(2) }}
@@ -121,13 +105,16 @@
 
     <div class="table-footer">
       <span class="footer-stat">
-        成功 <strong class="text-green">{{ successCount }}</strong>
+        <span class="footer-dot dot-success" />
+        成功 <strong>{{ successCount }}</strong>
       </span>
       <span class="footer-stat">
-        失败 <strong class="text-red">{{ failedCount }}</strong>
+        <span class="footer-dot dot-error" />
+        失败 <strong>{{ failedCount }}</strong>
       </span>
       <span class="footer-stat">
-        等待 <strong class="text-muted">{{ pendingCount }}</strong>
+        <span class="footer-dot dot-pending" />
+        等待 <strong>{{ pendingCount }}</strong>
       </span>
     </div>
 
@@ -142,7 +129,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Top, Bottom, Minus } from '@element-plus/icons-vue'
 import type { StockItem } from '@/composables/useStockAnalysis'
 import KLineChart from '@/components/stock/KLineChart.vue'
 
@@ -151,7 +137,6 @@ const props = defineProps<{
   sessionId?: string
 }>()
 
-// K线图弹窗状态
 const klineVisible = ref(false)
 const klineCode = ref('')
 const klineName = ref('')
@@ -166,39 +151,108 @@ function openKLine(row: StockItem) {
 const successCount = computed(() => props.items.filter(i => i.status === 'done').length)
 const failedCount = computed(() => props.items.filter(i => i.status === 'error').length)
 const pendingCount = computed(() => props.items.filter(i => i.status !== 'done' && i.status !== 'error').length)
-
-function conclusionTagType(conclusion: string | null): 'success' | 'danger' | 'warning' | 'info' {
-  if (conclusion === '看多') return 'success'
-  if (conclusion === '看空') return 'danger'
-  if (conclusion === '观望') return 'warning'
-  return 'info'
-}
 </script>
 
 <style scoped>
 .stock-table-wrap {
   background: var(--el-bg-color);
-  border-radius: 8px;
-  border: 1px solid var(--el-border-color-light);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
   overflow: hidden;
 }
+
 .code-font {
-  font-family: monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.text-muted { color: #94a3b8; }
+.text-green { color: #059669; font-weight: 600; }
+.text-red { color: #dc2626; font-weight: 600; }
+.text-danger { color: #dc2626; }
+
+/* 结论徽章 */
+.conclusion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 600;
 }
-.text-muted { color: var(--el-text-color-secondary); }
-.text-green { color: var(--el-color-success); font-weight: 600; }
-.text-red { color: var(--el-color-danger); font-weight: 600; }
-.text-danger { color: var(--el-color-danger); }
+
+.conclusion-buy {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.conclusion-wait {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.conclusion-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* 状态徽章 */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-analyzing {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.status-pending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status-error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* 表尾统计 */
 .table-footer {
   display: flex;
-  gap: 20px;
-  padding: 10px 16px;
-  border-top: 1px solid var(--el-border-color-extra-light);
+  gap: 24px;
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
   font-size: 13px;
-  color: var(--el-text-color-secondary);
+  color: #64748b;
+  background: #f8fafc;
 }
+
+.footer-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .footer-stat strong {
-  margin-left: 4px;
+  font-weight: 600;
+  color: #334155;
 }
+
+.footer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-success { background: #059669; }
+.dot-error { background: #dc2626; }
+.dot-pending { background: #94a3b8; }
 </style>

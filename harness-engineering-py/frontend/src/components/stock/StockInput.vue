@@ -1,6 +1,5 @@
 <template>
   <div class="stock-input">
-    <!-- 关键字搜索股票 -->
     <div class="input-row">
       <div class="option-item" style="flex: 1;">
         <label class="option-label">股票搜索</label>
@@ -10,7 +9,7 @@
             placeholder="输入关键字搜索股票..."
             clearable
             :loading="searchLoading"
-            style="flex: 1;"
+            class="search-input"
             @keydown="onSearchKeydown"
             @clear="clearSearch"
             @focus="showDropdown = searchResults.length > 0"
@@ -22,12 +21,12 @@
           <el-button
             :loading="searchLoading"
             :disabled="!searchKeyword.trim()"
+            type="primary"
             @click="handleSearchEnter"
           >
             搜索
           </el-button>
         </div>
-        <!-- 搜索结果下拉面板 -->
         <div
           v-if="showDropdown && (searchResults.length > 0 || searchLoading)"
           class="search-dropdown"
@@ -78,7 +77,6 @@
       </div>
     </div>
 
-    <!-- 股票代码标签输入器（始终显示） -->
     <div class="input-row">
       <div class="tag-input-wrapper">
         <el-tag
@@ -111,7 +109,7 @@
           + 添加股票
         </el-button>
       </div>
-      <span class="input-helper">搜索股票后勾选添加，或直接输入代码按回车添加。按 Backspace 删除最后一个标签</span>
+      <span class="input-helper">搜索股票后勾选添加，或直接输入代码按回车添加</span>
     </div>
 
     <div class="input-row options-row">
@@ -131,19 +129,18 @@
       </div>
 
       <div class="option-item">
-        <label class="option-label">Skills</label>
+        <label class="option-label">策略</label>
         <el-select
-          :model-value="selectedSkills"
-          multiple
-          placeholder="选择 Skills"
-          style="width: 240px"
-          @update:model-value="$emit('update:selectedSkills', $event)"
+          :model-value="selectedStrategy"
+          placeholder="选择策略"
+          style="width: 220px"
+          @update:model-value="onStrategyChange"
         >
           <el-option
-            v-for="skill in skills"
-            :key="skill.id"
-            :label="skill.name"
-            :value="skill.id"
+            v-for="s in strategyList"
+            :key="s.id"
+            :label="s.name"
+            :value="s.id"
           />
         </el-select>
       </div>
@@ -151,7 +148,8 @@
       <el-button
         type="primary"
         :loading="isAnalyzing"
-        :disabled="modelValue.length === 0"
+        :disabled="modelValue.length === 0 || !selectedStrategy"
+        class="btn-start"
         @click="$emit('start')"
       >
         {{ isAnalyzing ? '分析中...' : '开始诊股' }}
@@ -159,43 +157,145 @@
 
       <el-button
         v-if="modelValue.length > 0 && !isAnalyzing"
+        class="btn-clear"
         @click="$emit('clear')"
       >
         清空
       </el-button>
+    </div>
+
+    <div v-if="selectedStrategy && getCurrentStrategy()" class="strategy-config-panel">
+      <div class="config-header" @click="configExpanded = !configExpanded">
+        <div class="config-summary">
+          <span class="config-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+            </svg>
+          </span>
+          <span class="config-strategy-name">{{ getCurrentStrategy()?.name }}</span>
+          <span class="config-summary-text">{{ getSummary(currentConfigValues) }}</span>
+        </div>
+        <div class="config-actions">
+          <el-button size="small" text @click.stop="resetConfig">重置默认</el-button>
+          <el-icon :class="{ 'is-expanded': configExpanded }" class="config-arrow">
+            <ArrowDown />
+          </el-icon>
+        </div>
+      </div>
+      <div v-show="configExpanded" class="config-body">
+        <div
+          v-for="item in getCurrentStrategy()?.configSchema || []"
+          :key="item.key"
+          class="config-item"
+        >
+          <label class="config-label">{{ item.label }}</label>
+          <el-input-number
+            v-if="item.type === 'int'"
+            :model-value="currentConfigValues[item.key] ?? item.default"
+            :min="item.min"
+            :max="item.max"
+            :step="item.step || 1"
+            size="small"
+            controls-position="right"
+            class="config-input"
+            @update:model-value="onConfigChange(item.key, $event)"
+          />
+          <el-input-number
+            v-else-if="item.type === 'float'"
+            :model-value="currentConfigValues[item.key] ?? item.default"
+            :min="item.min"
+            :max="item.max"
+            :step="item.step || 0.01"
+            :precision="3"
+            size="small"
+            controls-position="right"
+            class="config-input"
+            @update:model-value="onConfigChange(item.key, $event)"
+          />
+          <span class="config-desc">{{ item.description }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { Search, Loading } from '@element-plus/icons-vue'
+import { Search, Loading, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { Skill } from '@/types'
+import type { StrategyInfo } from '@/types/stock'
 import type { StockSearchResult } from '@/types/stock'
 
 const props = defineProps<{
   modelValue: string[]
   days: number
-  skills: Skill[]
-  selectedSkills: string[]
+  strategyList: StrategyInfo[]
+  selectedStrategy: string
+  strategyConfig: Record<string, any>
   isAnalyzing: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [codes: string[]]
   'update:days': [days: number]
-  'update:selectedSkills': [skills: string[]]
+  'update:selectedStrategy': [strategy: string]
+  'update:strategyConfig': [config: Record<string, any>]
   start: []
   clear: []
 }>()
 
-// 手动输入标签
+const configExpanded = ref(false)
+const currentConfigValues = ref<Record<string, any>>({})
+
+function getCurrentStrategy(): StrategyInfo | undefined {
+  return props.strategyList.find(s => s.id === props.selectedStrategy)
+}
+
+function onStrategyChange(strategyId: string) {
+  emit('update:selectedStrategy', strategyId)
+  const strategy = props.strategyList.find(s => s.id === strategyId)
+  if (strategy) {
+    const defaults: Record<string, any> = {}
+    strategy.configSchema.forEach(item => {
+      defaults[item.key] = item.default
+    })
+    currentConfigValues.value = defaults
+    emit('update:strategyConfig', { ...defaults })
+  }
+}
+
+function resetConfig() {
+  const strategy = getCurrentStrategy()
+  if (strategy) {
+    const defaults: Record<string, any> = {}
+    strategy.configSchema.forEach(item => {
+      defaults[item.key] = item.default
+    })
+    currentConfigValues.value = { ...defaults }
+    emit('update:strategyConfig', { ...defaults })
+  }
+}
+
+function onConfigChange(key: string, value: any) {
+  currentConfigValues.value[key] = value
+  emit('update:strategyConfig', { ...currentConfigValues.value })
+}
+
+function getSummary(config: Record<string, any>): string {
+  const strategy = getCurrentStrategy()
+  if (!strategy || !strategy.configSchema || strategy.configSchema.length === 0) return ''
+  return strategy.configSchema.slice(0, 3)
+    .map(item => {
+      const val = config[item.key] ?? item.default
+      return `${item.label.split(/[（(]/)[0]}${val}`
+    })
+    .join(' · ')
+}
+
 const inputVisible = ref(false)
 const inputValue = ref('')
 const inputRef = ref()
 
-// 搜索相关
 const searchKeyword = ref('')
 const searchLoading = ref(false)
 const searchResults = ref<StockSearchResult[]>([])
@@ -235,7 +335,6 @@ function handleBackspace() {
   }
 }
 
-// ---- 搜索逻辑 ----
 function onSearchKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter') {
     e.preventDefault()
@@ -318,125 +417,286 @@ function addCheckedStocks() {
 
 <style scoped>
 .stock-input {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
+
 .input-row {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
+
 .options-row {
   display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.tag-input-wrapper {
-  display: flex;
+  gap: 12px;
+  align-items: flex-end;
   flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  min-height: 36px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 6px 10px;
-  border: 1px solid var(--el-border-color);
-  border-radius: 8px;
-  background: var(--el-bg-color);
 }
-.stock-tag {
-  font-family: monospace;
-}
-.tag-input {
-  width: 160px;
-}
-.add-tag-btn {
-  border-style: dashed;
-}
-.input-helper {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
-}
+
 .option-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
+
 .option-label {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--el-text-color-regular);
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: 0.01em;
 }
+
 .search-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* 搜索结果下拉 */
+.search-input {
+  flex: 1;
+}
+
+.tag-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 42px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: var(--el-bg-color);
+  transition: border-color 0.2s;
+}
+
+.tag-input-wrapper:focus-within {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.stock-tag {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tag-input {
+  width: 160px;
+}
+
+.add-tag-btn {
+  border-style: dashed;
+  color: #64748b;
+}
+
+.input-helper {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.btn-start {
+  font-weight: 600;
+  padding: 0 24px;
+  background: #059669;
+  border-color: #059669;
+}
+
+.btn-start:hover {
+  background: #047857;
+  border-color: #047857;
+}
+
+.btn-clear {
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+.strategy-config-panel {
+  margin-top: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: var(--el-bg-color);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.strategy-config-panel:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.config-header:hover {
+  background: #f8fafc;
+}
+
+.config-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.config-icon {
+  color: #059669;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.config-strategy-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+  white-space: nowrap;
+}
+
+.config-summary-text {
+  font-size: 12px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.config-arrow {
+  transition: transform 0.2s;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.config-arrow.is-expanded {
+  transform: rotate(180deg);
+}
+
+.config-body {
+  padding: 12px 16px 16px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.config-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-label {
+  font-size: 13px;
+  color: #334155;
+  white-space: nowrap;
+  min-width: 110px;
+  font-weight: 500;
+}
+
+.config-input {
+  width: 160px;
+}
+
+.config-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .search-dropdown {
   position: absolute;
   z-index: 1000;
-  margin-top: 4px;
+  margin-top: 6px;
   width: 100%;
   max-width: 600px;
   background: var(--el-bg-color);
-  border: 1px solid var(--el-border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
+
 .search-loading {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 16px;
-  color: var(--el-text-color-secondary);
+  padding: 20px;
+  color: #64748b;
   font-size: 13px;
 }
+
 .search-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  background: var(--el-fill-color-light);
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
 }
+
 .search-count {
   font-size: 12px;
-  color: var(--el-text-color-secondary);
+  color: #64748b;
 }
+
 .search-results {
-  max-height: 260px;
+  max-height: 280px;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: 6px 0;
 }
+
 .search-result-item {
-  padding: 4px 12px;
-  transition: background 0.15s;
+  padding: 6px 14px;
+  transition: background 0.12s;
 }
+
 .search-result-item:hover {
-  background: var(--el-fill-color-light);
+  background: #f8fafc;
 }
+
 .search-result-item .el-checkbox {
   width: 100%;
 }
+
 .stock-code {
-  font-family: monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-weight: 600;
   margin-right: 8px;
-  color: var(--el-color-primary);
+  color: #059669;
 }
+
 .stock-name {
   margin-right: 6px;
+  color: #334155;
 }
+
 .stock-type-tag {
   margin-left: 6px;
 }
+
 .search-footer {
   display: flex;
   gap: 8px;
-  padding: 8px 12px;
-  border-top: 1px solid var(--el-border-color-lighter);
+  padding: 10px 14px;
+  border-top: 1px solid #f1f5f9;
   justify-content: flex-end;
 }
 </style>
