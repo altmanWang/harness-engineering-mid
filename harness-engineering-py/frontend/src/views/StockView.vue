@@ -1,9 +1,12 @@
 <template>
   <div class="stock-page">
     <div class="page-header">
-      <h2 class="page-title">
-        {{ viewingRecord ? `智能诊股 — ${viewingRecord.title}` : '智能诊股' }}
-      </h2>
+      <div class="header-left">
+        <h2 class="page-title">
+          {{ viewingRecord ? `智能诊股 — ${viewingRecord.title}` : '智能诊股' }}
+        </h2>
+        <p class="page-subtitle">基于策略信号模型，智能判断买入/观望时机</p>
+      </div>
     </div>
 
     <StockCompare
@@ -29,20 +32,28 @@
         :session-id="sessionId || loadedSessionId || ''"
       />
 
-      <!-- 分析进度条 -->
       <div v-if="isAnalyzing && !isSuppressed" class="analysis-progress">
+        <div class="progress-info">
+          <span class="progress-label">分析进度</span>
+          <span class="progress-count">{{ completedCount }} / {{ totalCount }}</span>
+        </div>
         <el-progress
           :percentage="totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0"
-          :stroke-width="6"
+          :stroke-width="8"
           :show-text="false"
+          color="#059669"
         />
-        <span class="progress-text">正在分析第 {{ completedCount + 1 > totalCount ? totalCount : completedCount + 1 }}/{{ totalCount }} 只</span>
       </div>
 
-      <el-empty
-        v-else-if="!isAnalyzing"
-        description="输入股票代码，点击「开始诊股」开始分析"
-      />
+      <div v-else-if="!isAnalyzing && items.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">开始智能诊股</h3>
+        <p class="empty-desc">搜索并添加股票代码，选择策略后点击「开始诊股」</p>
+      </div>
     </template>
 
     <div v-if="viewingRecord && compareRecords.length < 2" class="record-actions">
@@ -82,7 +93,6 @@ const strategyConfig = ref<Record<string, any>>({})
 const viewingRecord = ref<ChatSession | null>(null)
 const loadedSessionId = ref<string | null>(null)
 
-// Compare mode
 const compareIds = computed(() => {
   const raw = route.query.compare as string
   if (!raw) return []
@@ -101,7 +111,6 @@ onMounted(async () => {
     if (res.ok) {
       const data = await res.json()
       strategyList.value = data.strategies || []
-      // 初始化第一个策略的默认配置
       if (strategyList.value.length > 0) {
         const defaults: Record<string, any> = {}
         strategyList.value[0].configSchema.forEach(item => {
@@ -133,7 +142,6 @@ function loadViewingRecord() {
 
   const session = chatStore.sessions.find(s => s.id === sid)
   if (session && session.type === 'stock_diagnosis' && session.diagnosis) {
-    // 切换到已完成的历史会话：抑制 SSE 但不关闭连接
     if (isAnalyzing.value && sessionId.value !== sid) {
       suppress()
     }
@@ -160,7 +168,6 @@ function loadViewingRecord() {
       return { code, status: 'pending' as const, result: null, error: null }
     })
   } else if (session && session.type === 'stock_diagnosis' && isAnalyzing.value && sessionId.value === sid) {
-    // 切回正在运行的 session：恢复 SSE 更新，从快照恢复
     resume()
     viewingRecord.value = null
     loadedSessionId.value = sid
@@ -195,7 +202,7 @@ async function handleAskAI() {
   const diag = viewingRecord.value.diagnosis
   const summary = diag.results
     .filter(r => r.conclusion)
-    .map(r => `${r.code} ${r.name}: ${r.conclusion} - ${r.reason}`)
+    .map(r => `${r.code} ${r.name}: ${r.conclusion}`)
     .join('\n')
 
   const prompt = `以下是之前对以下股票的诊股结果:\n${summary}\n\n我想进一步了解: `
@@ -215,42 +222,97 @@ async function handleAskAI() {
 .stock-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px;
 }
+
 .page-header {
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #64748b;
   margin: 0;
 }
+
 .record-actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
+
 .record-time {
   font-size: 13px;
   color: var(--el-text-color-placeholder);
 }
+
 .analysis-progress {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
+  margin-top: 16px;
+  padding: 16px 20px;
   background: var(--el-bg-color);
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--el-border-color-light);
 }
-.analysis-progress .el-progress {
-  flex: 1;
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
-.progress-text {
+
+.progress-label {
   font-size: 13px;
-  color: var(--el-text-color-secondary);
-  white-space: nowrap;
+  font-weight: 500;
+  color: #334155;
+}
+
+.progress-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #059669;
+}
+
+.empty-state {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+}
+
+.empty-icon {
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0;
 }
 </style>
