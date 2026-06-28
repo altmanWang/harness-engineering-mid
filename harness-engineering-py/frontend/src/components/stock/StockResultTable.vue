@@ -32,9 +32,8 @@
               size="small"
             >
               <el-icon style="margin-right: 2px; vertical-align: middle;">
-                <Top v-if="row.result.conclusion === '看多'" />
-                <Bottom v-else-if="row.result.conclusion === '看空'" />
-                <Minus v-else />
+                <CircleCheck v-if="row.result.conclusion === '买入'" />
+                <Clock v-else />
               </el-icon>
               {{ row.result.conclusion || '—' }}
             </el-tag>
@@ -142,7 +141,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Top, Bottom, Minus } from '@element-plus/icons-vue'
+import { CircleCheck, Clock } from '@element-plus/icons-vue'
 import type { StockItem } from '@/composables/useStockAnalysis'
 import KLineChart from '@/components/stock/KLineChart.vue'
 
@@ -168,8 +167,7 @@ const failedCount = computed(() => props.items.filter(i => i.status === 'error')
 const pendingCount = computed(() => props.items.filter(i => i.status !== 'done' && i.status !== 'error').length)
 
 function conclusionTagType(conclusion: string | null): 'success' | 'danger' | 'warning' | 'info' {
-  if (conclusion === '看多') return 'success'
-  if (conclusion === '看空') return 'danger'
+  if (conclusion === '买入') return 'success'
   if (conclusion === '观望') return 'warning'
   return 'info'
 }
