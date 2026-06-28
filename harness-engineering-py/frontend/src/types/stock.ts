@@ -11,6 +11,8 @@ export interface DiagnosisResult {
   source?: string
   klinePath?: string
   klineDate?: string
+  backtestBarsPath?: string
+  backtestSummaryPath?: string
 }
 
 export interface StrategyConfigItem {
@@ -49,6 +51,30 @@ export interface SectorInfo {
   code: string
   name: string
   type?: string  // "行业" | "概念"
+}
+
+export interface BacktestSummary {
+  stock_code: string
+  stock_name: string
+  initial_capital: number
+  final_capital: number
+  total_return: number
+  max_drawdown: number
+  win_rate: number
+  trade_count: number
+}
+
+export interface BacktestBar {
+  date: string
+  stock_name: string
+  open: number
+  close: number
+  signal: string | null
+  cost: number | null
+  profit: number | null
+  capital: number
+  stop_loss: number | null
+  target_price: number | null
 }
 
 export interface StockSearchResult {
