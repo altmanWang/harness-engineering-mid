@@ -1,21 +1,29 @@
 <template>
   <div class="stock-input">
     <div class="input-row">
-      <div class="option-item" style="flex: 1;">
+      <div class="option-item search-option-item">
         <label class="option-label">股票搜索</label>
         <div class="search-row">
           <el-input
             v-model="searchKeyword"
             placeholder="输入关键字搜索股票..."
-            clearable
             :loading="searchLoading"
             class="search-input"
             @keydown="onSearchKeydown"
-            @clear="clearSearch"
-            @focus="showDropdown = searchResults.length > 0"
+            @focus="onSearchFocus"
+            @input="onSearchInput"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
+            </template>
+            <template #suffix>
+              <el-icon
+                v-if="searchKeyword && !searchLoading"
+                class="search-clear-icon"
+                @click.stop="clearSearch"
+              >
+                <CircleClose />
+              </el-icon>
             </template>
           </el-input>
           <el-button
@@ -30,6 +38,7 @@
         <div
           v-if="showDropdown && (searchResults.length > 0 || searchLoading)"
           class="search-dropdown"
+          @mouseleave="onDropdownLeave"
         >
           <div v-if="searchLoading" class="search-loading">
             <el-icon class="is-loading"><Loading /></el-icon>
@@ -52,8 +61,14 @@
                   v-for="stock in searchResults"
                   :key="stock.code"
                   class="search-result-item"
+                  :class="{ 'is-added': isCodeAdded(stock.code) }"
+                  @click="handleResultClick(stock)"
                 >
-                  <el-checkbox :value="stock.code" :disabled="isCodeAdded(stock.code)">
+                  <el-checkbox
+                    :value="stock.code"
+                    :disabled="isCodeAdded(stock.code)"
+                    @click.stop
+                  >
                     <span class="stock-code">{{ stock.code }}</span>
                     <span class="stock-name">{{ stock.name }}</span>
                     <el-tag v-if="stock.type" size="small" type="info" class="stock-type-tag">
@@ -221,7 +236,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { Search, Loading, ArrowDown } from '@element-plus/icons-vue'
+import { Search, Loading, ArrowDown, CircleClose } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import type { StrategyInfo } from '@/types/stock'
 import type { StockSearchResult } from '@/types/stock'
@@ -373,6 +388,49 @@ function clearSearch() {
   searchKeyword.value = ''
   searchResults.value = []
   checkedStocks.value = []
+  showDropdown.value = false
+}
+
+// 聚焦时自动重新搜索（如果有关键词）
+function onSearchFocus() {
+  if (searchKeyword.value.trim() && searchResults.value.length === 0) {
+    handleSearchEnter()
+  } else if (searchResults.value.length > 0) {
+    showDropdown.value = true
+  }
+}
+
+// 输入时自动搜索（防抖 300ms）
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+function onSearchInput() {
+  if (searchTimer) clearTimeout(searchTimer)
+  const keyword = searchKeyword.value.trim()
+  if (!keyword) {
+    // 清空输入框后关闭下拉
+    searchResults.value = []
+    checkedStocks.value = []
+    showDropdown.value = false
+    return
+  }
+  // 如果之前有结果，直接显示下拉；否则自动搜索
+  if (searchResults.value.length > 0) {
+    showDropdown.value = true
+  }
+  searchTimer = setTimeout(() => {
+    doSearch(keyword)
+  }, 300)
+}
+
+// 点击结果行直接添加（已添加的不可再添加）
+function handleResultClick(stock: StockSearchResult) {
+  if (isCodeAdded(stock.code)) return
+  emit('update:modelValue', [...props.modelValue, stock.code])
+  ElMessage.success(`已添加 ${stock.code} ${stock.name}`)
+  // 不关闭下拉，允许继续添加
+}
+
+// 鼠标移出下拉区域自动关闭
+function onDropdownLeave() {
   showDropdown.value = false
 }
 
@@ -621,6 +679,23 @@ function addCheckedStocks() {
   white-space: nowrap;
 }
 
+/* 搜索容器设置相对定位，让下拉框定位在此下方 */
+.search-option-item {
+  position: relative;
+}
+
+/* 自定义清除图标，比 el-input 自带的 clearable 更大更好点 */
+.search-clear-icon {
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 16px;
+  transition: color 0.15s;
+}
+.search-clear-icon:hover {
+  color: #475569;
+}
+
+/* 搜索结果下拉 */
 .search-dropdown {
   position: absolute;
   z-index: 1000;
@@ -664,14 +739,21 @@ function addCheckedStocks() {
 }
 
 .search-result-item {
-  padding: 6px 14px;
-  transition: background 0.12s;
+  padding: 4px 12px;
+  transition: background 0.15s;
+  cursor: pointer;
 }
 
 .search-result-item:hover {
   background: #f8fafc;
 }
-
+.search-result-item.is-added {
+  cursor: default;
+  opacity: 0.65;
+}
+.search-result-item.is-added:hover {
+  background: transparent;
+}
 .search-result-item .el-checkbox {
   width: 100%;
 }
