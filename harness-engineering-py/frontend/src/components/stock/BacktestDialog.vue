@@ -91,6 +91,11 @@ watch(visible, v => { emit('update:modelValue', v) })
 
 const { loading, error, summary, bars, fetchBacktest, reset } = useBacktest()
 
+interface KLineRow {
+  date: string; open: number; close: number; high: number; low: number; volume: number; ema20: number
+}
+const klineData = ref<KLineRow[]>([])
+
 const title = computed(() => {
   if (!props.result) return '回测详情'
   return `回测详情 — ${props.result.name || props.result.code} (${props.result.code})`
@@ -107,13 +112,21 @@ let capitalInstance: echarts.ECharts | null = null
 function onOpened() {
   if (!props.result) return
   fetchBacktest(props.result, props.sessionId).then(() => {
-    if (!error.value && bars.value.length > 0) {
-      nextTick(() => {
-        renderKLineChart()
-        renderReturnChart()
-        renderCapitalChart()
+    // Also fetch real K-line data for the candlestick chart
+    fetch(`/api/stock/kline/${props.sessionId}/${props.result!.code}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (json?.data) klineData.value = json.data as KLineRow[]
       })
-    }
+      .finally(() => {
+        if (!error.value && bars.value.length > 0) {
+          nextTick(() => {
+            renderKLineChart()
+            renderReturnChart()
+            renderCapitalChart()
+          })
+        }
+      })
   })
 }
 
@@ -135,21 +148,28 @@ function renderKLineChart() {
   klineInstance = echarts.init(klineChartRef.value)
 
   const dates = bars.value.map(b => b.date)
-  const ohlcApprox = bars.value.map(b => {
-    const o = b.open; const c = b.close
-    return [o, c, Math.max(o, c), Math.min(o, c)]
-  })
-  const volumes = bars.value.map(b => {
-    const cost = b.cost || 0
-    return cost > 0 ? Math.round(cost / (b.close || 1)) : 0
-  })
 
-  // Buy/Sell markers
+  // Use real K-line data if available, otherwise approximate from bars
+  const ohlcData = klineData.value.length > 0
+    ? klineData.value.map(d => [d.open, d.close, d.low, d.high])
+    : bars.value.map(b => {
+        const o = b.open; const c = b.close
+        return [o, c, Math.max(o, c), Math.min(o, c)]
+      })
+
+  const volumeData = klineData.value.length > 0
+    ? klineData.value.map(d => d.volume)
+    : bars.value.map(b => {
+        const cost = b.cost || 0
+        return cost > 0 ? Math.round(cost / (b.close || 1)) : 0
+      })
+
+  // Buy/Sell markers from backtest bars
   const buyMarks = bars.value
-    .map((b, i) => b.signal === '买入' ? { coord: [dates[i], ohlcApprox[i][2]], value: '买入' } : null)
+    .map((b, i) => b.signal === '买入' ? { coord: [dates[i], ohlcData[i][2]], value: '买入' } : null)
     .filter(Boolean) as { coord: [string, number]; value: string }[]
   const sellMarks = bars.value
-    .map((b, i) => b.signal === '卖出' ? { coord: [dates[i], ohlcApprox[i][3]], value: '卖出' } : null)
+    .map((b, i) => b.signal === '卖出' ? { coord: [dates[i], ohlcData[i][3]], value: '卖出' } : null)
     .filter(Boolean) as { coord: [string, number]; value: string }[]
 
   const option: echarts.EChartsOption = {
@@ -175,12 +195,12 @@ function renderKLineChart() {
     ],
     series: [
       {
-        name: 'K线', type: 'candlestick', xAxisIndex: 0, yAxisIndex: 0, data: ohlcApprox,
+        name: 'K线', type: 'candlestick', xAxisIndex: 0, yAxisIndex: 0, data: ohlcData,
         itemStyle: { color: '#ef5350', color0: '#26a69a', borderColor: '#ef5350', borderColor0: '#26a69a' },
       },
       {
-        name: '成交量', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: volumes.map((vol, i) => {
-          const item = ohlcApprox[i]
+        name: '成交量', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: volumeData.map((vol, i) => {
+          const item = ohlcData[i]
           return { value: vol, itemStyle: { color: item[1] >= item[0] ? '#ef5350' : '#26a69a' } }
         }),
       },
