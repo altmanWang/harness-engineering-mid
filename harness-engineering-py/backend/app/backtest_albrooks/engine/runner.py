@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import io
+import json
 import sys
 from pathlib import Path
 
@@ -14,22 +15,27 @@ from ..strategies.ema_pullback import EMA20PullbackStrategy
 from ..strategies.ema_pullback_config import INITIAL_CAPITAL
 
 
-def run_backtest(csv_path: str, output_path: str | None = None, plot: bool = False) -> str:
-    """回测模式：运行 Cerebro，输出交易记录 CSV 和收益曲线图。
+def run_backtest(csv_path: str, output_dir: str | None = None, config_overrides: dict | None = None, plot: bool = False) -> dict:
+    """回测模式：运行 Cerebro，输出交易记录 CSV 和汇总 JSON。
 
     Args:
         csv_path: 输入 CSV 路径
-        output_path: 输出 CSV 路径（None 则自动生成）
+        output_dir: 输出目录（存放 bars CSV 和 summary JSON），None 则自动使用 CSV 所在目录
+        config_overrides: 策略参数覆盖
         plot: 是否显示图表
 
     Returns:
-        输出的交易记录 CSV 路径
+        {"bars_csv": str, "summary_json": str, "summary": dict}
     """
     data, stock_name = load_csv_data(csv_path)
 
+    strategy_kwargs: dict = {"stock_name": stock_name}
+    if config_overrides:
+        strategy_kwargs.update(config_overrides)
+
     cerebro = bt.Cerebro()
     cerebro.adddata(data)
-    cerebro.addstrategy(EMA20PullbackStrategy, stock_name=stock_name)
+    cerebro.addstrategy(EMA20PullbackStrategy, **strategy_kwargs)
     cerebro.broker.setcash(INITIAL_CAPITAL)
 
     starting_value = cerebro.broker.getvalue()
@@ -46,16 +52,74 @@ def run_backtest(csv_path: str, output_path: str | None = None, plot: bool = Fal
     print(f"收益率: {(final_value / starting_value - 1) * 100:+.2f}%")
     print(f"交易记录数: {len(strategy.recorder)}")
 
-    # 输出交易记录 CSV
-    if output_path is None:
-        input_path = Path(csv_path)
-        output_path = str(input_path.parent / f"{input_path.stem}_trades.csv")
-    strategy.recorder.to_csv(output_path)
-    print(f"交易记录已保存至: {output_path}")
+    # 确定输出目录
+    input_path = Path(csv_path)
+    out_dir = Path(output_dir) if output_dir else input_path.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
+    code = input_path.stem.split("_")[0] if "_" in input_path.stem else input_path.stem
+
+    # 输出 bars CSV
+    bars_csv = str(out_dir / f"{code}_bars.csv")
+    strategy.recorder.to_csv(bars_csv)
+    print(f"交易记录已保存至: {bars_csv}")
+
+    # 计算汇总指标
+    records = strategy.recorder._records
+    # 从 bars 中提取交易信号
+    buy_records: list[dict] = []
+    sell_records: list[dict] = []
+    for r in records:
+        sig = r.get("signal", "")
+        if sig == "买入":
+            buy_records.append(r)
+        elif sig == "卖出":
+            sell_records.append(r)
+
+    # 计算胜率：配对买入-卖出，计算每笔盈亏
+    win_count = 0
+    total_trades = min(len(buy_records), len(sell_records))
+    for i in range(total_trades):
+        buy_cost = buy_records[i].get("cost", 0) or 0
+        sell_profit = sell_records[i].get("profit", 0) or 0
+        if sell_profit > 0:
+            win_count += 1
+
+    win_rate = (win_count / total_trades * 100) if total_trades > 0 else 0.0
+
+    # 计算最大回撤：从资金序列中找
+    capital_series = [r.get("capital", starting_value) or starting_value for r in records]
+    peak = capital_series[0]
+    max_dd = 0.0
+    for cap in capital_series:
+        if cap > peak:
+            peak = cap
+        dd = (peak - cap) / peak * 100 if peak > 0 else 0
+        if dd > max_dd:
+            max_dd = dd
+
+    total_return = (final_value / starting_value - 1) * 100 if starting_value > 0 else 0.0
+
+    summary = {
+        "stock_code": code,
+        "stock_name": stock_name,
+        "initial_capital": round(starting_value, 2),
+        "final_capital": round(final_value, 2),
+        "total_return": round(total_return, 2),
+        "max_drawdown": round(max_dd, 2),
+        "win_rate": round(win_rate, 2),
+        "trade_count": total_trades,
+    }
+
+    # 输出 summary JSON
+    summary_json = str(out_dir / f"{code}_summary.json")
+    with open(summary_json, "w", encoding="utf-8") as f:
+        json.dump(summary, f, ensure_ascii=False, indent=2)
+    print(f"汇总已保存至: {summary_json}")
 
     if plot:
         cerebro.plot(style="candlestick")
-    return output_path
+
+    return {"bars_csv": bars_csv, "summary_json": summary_json, "summary": summary}
 
 
 def run_signal(csv_path: str, config_overrides: dict | None = None) -> dict:
