@@ -14,6 +14,7 @@ from typing import Optional
 import requests
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from app.models.schemas import (
     StockAnalyzeRequest, StockDiagnosis, DiagnosisResult,
@@ -22,7 +23,7 @@ from app.models.schemas import (
 from app.services.session_store import save_session, get_session, list_sessions
 from app.services.worktree_manager import WORKTREES_DIR
 from app.backtest_albrooks.strategies.registry import STRATEGY_REGISTRY
-from app.backtest_albrooks.engine.runner import run_signal
+from app.backtest_albrooks.engine.runner import run_signal, run_backtest
 
 # 确保 a_stock_client 可导入
 _STOCK_CLIENT_ROOT = Path(__file__).resolve().parent.parent.parent / "a_stock_client"
@@ -713,6 +714,115 @@ async def get_kline_data(session_id: str, code: str):
         "klineDate": kline_date,
         "data": rows,
     }
+
+
+@router.get("/stock/backtest/summary/{session_id}/{code}")
+async def get_backtest_summary(session_id: str, code: str):
+    """读取缓存的回测汇总 JSON."""
+    import json as _json
+
+    backtest_dir = WORKTREES_DIR / session_id / "backtest"
+    summary_path = backtest_dir / f"{code}_summary.json"
+
+    if not summary_path.exists():
+        raise HTTPException(status_code=404, detail=f"Backtest summary not found for {code}")
+
+    try:
+        with open(summary_path, "r", encoding="utf-8") as f:
+            return _json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read backtest summary: {e}")
+
+
+@router.get("/stock/backtest/bars/{session_id}/{code}")
+async def get_backtest_bars(session_id: str, code: str):
+    """读取缓存的回测 bars CSV，返回 JSON."""
+    import csv as _csv
+
+    backtest_dir = WORKTREES_DIR / session_id / "backtest"
+    bars_path = backtest_dir / f"{code}_bars.csv"
+
+    if not bars_path.exists():
+        raise HTTPException(status_code=404, detail=f"Backtest bars not found for {code}")
+
+    bars: list[dict] = []
+    try:
+        with open(bars_path, "r", encoding="utf-8-sig") as f:
+            reader = _csv.DictReader(f)
+            for row in reader:
+                bars.append({
+                    "date": (row.get("date") or "").strip(),
+                    "stock_name": (row.get("stock_name") or "").strip(),
+                    "open": float(row.get("open", 0) or 0),
+                    "close": float(row.get("close", 0) or 0),
+                    "signal": (row.get("signal") or "").strip() or None,
+                    "cost": float(row.get("cost", 0) or 0) if row.get("cost", "").strip() else None,
+                    "profit": float(row.get("profit", 0) or 0) if row.get("profit", "").strip() else None,
+                    "capital": float(row.get("capital", 0) or 0),
+                    "stop_loss": float(row.get("stop_loss", 0) or 0) if row.get("stop_loss", "").strip() else None,
+                    "target_price": float(row.get("target_price", 0) or 0) if row.get("target_price", "").strip() else None,
+                })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read backtest bars: {e}")
+
+    return {"code": code, "bars": bars}
+
+
+class BacktestTriggerRequest(BaseModel):
+    code: str
+    sessionId: str
+    strategy: str = "ema_pullback"
+    strategyConfig: dict = {}
+
+
+@router.post("/stock/backtest")
+async def trigger_backtest(body: BacktestTriggerRequest):
+    """触发回测：调用 run_backtest，保存结果，返回 summary."""
+    session = await get_session(body.sessionId)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # 查找 K 线 CSV
+    kline_dir = WORKTREES_DIR / body.sessionId / "kline"
+    if not kline_dir.exists():
+        raise HTTPException(status_code=404, detail="K-line data not found for session")
+
+    csv_files = sorted(kline_dir.glob(f"{body.code}_*.csv"))
+    if not csv_files:
+        raise HTTPException(status_code=404, detail=f"No K-line file for {body.code}")
+
+    kline_path = str(csv_files[0])
+
+    # 回测输出目录
+    backtest_dir = WORKTREES_DIR / body.sessionId / "backtest"
+    backtest_dir.mkdir(parents=True, exist_ok=True)
+
+    # 校验策略配置
+    strategy_config = _validate_config(body.strategy, body.strategyConfig or {})
+
+    # 运行回测（同步，在线程池中执行）
+    try:
+        result = await asyncio.wait_for(
+            asyncio.to_thread(
+                run_backtest, kline_path,
+                output_dir=str(backtest_dir),
+                config_overrides=strategy_config,
+            ),
+            timeout=300.0,  # 5 minutes
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Backtest failed: {e}")
+
+    # 回填 DiagnosisResult
+    if session.diagnosis:
+        for r in session.diagnosis.results:
+            if r.code == body.code:
+                r.backtestBarsPath = f"worktrees/{body.sessionId}/backtest/{body.code}_bars.csv"
+                r.backtestSummaryPath = f"worktrees/{body.sessionId}/backtest/{body.code}_summary.json"
+                break
+        await save_session(session)
+
+    return result["summary"]
 
 
 def _parse_search_table(text: str) -> list[dict]:

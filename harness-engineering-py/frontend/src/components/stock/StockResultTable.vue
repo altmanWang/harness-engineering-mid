@@ -88,7 +88,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="90" align="center" fixed="right">
+      <el-table-column label="操作" width="150" align="center" fixed="right">
         <template #default="{ row }">
           <el-button
             v-if="row.status === 'done' && row.result"
@@ -98,6 +98,15 @@
             @click="openKLine(row)"
           >
             详情
+          </el-button>
+          <el-button
+            v-if="row.status === 'done' && row.result"
+            type="primary"
+            link
+            size="small"
+            @click="emit('backtest', row)"
+          >
+            回测
           </el-button>
         </template>
       </el-table-column>
@@ -135,6 +144,10 @@ import KLineChart from '@/components/stock/KLineChart.vue'
 const props = defineProps<{
   items: StockItem[]
   sessionId?: string
+}>()
+
+const emit = defineEmits<{
+  backtest: [row: StockItem]
 }>()
 
 const klineVisible = ref(false)
