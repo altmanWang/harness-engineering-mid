@@ -131,19 +131,18 @@
       </div>
 
       <div class="option-item">
-        <label class="option-label">Skills</label>
+        <label class="option-label">策略</label>
         <el-select
-          :model-value="selectedSkills"
-          multiple
-          placeholder="选择 Skills"
-          style="width: 240px"
-          @update:model-value="$emit('update:selectedSkills', $event)"
+          :model-value="selectedStrategy"
+          placeholder="选择策略"
+          style="width: 220px"
+          @update:model-value="onStrategyChange"
         >
           <el-option
-            v-for="skill in skills"
-            :key="skill.id"
-            :label="skill.name"
-            :value="skill.id"
+            v-for="s in strategyList"
+            :key="s.id"
+            :label="s.name"
+            :value="s.id"
           />
         </el-select>
       </div>
@@ -151,7 +150,7 @@
       <el-button
         type="primary"
         :loading="isAnalyzing"
-        :disabled="modelValue.length === 0"
+        :disabled="modelValue.length === 0 || !selectedStrategy"
         @click="$emit('start')"
       >
         {{ isAnalyzing ? '分析中...' : '开始诊股' }}
@@ -164,31 +163,133 @@
         清空
       </el-button>
     </div>
+
+    <!-- 策略配置折叠面板 -->
+    <div v-if="selectedStrategy && getCurrentStrategy()" class="strategy-config-panel">
+      <div class="config-header" @click="configExpanded = !configExpanded">
+        <div class="config-summary">
+          <span class="config-strategy-name">{{ getCurrentStrategy()?.name }}</span>
+          <span class="config-summary-text">{{ getSummary(currentConfigValues) }}</span>
+        </div>
+        <div class="config-actions">
+          <el-button size="small" text @click.stop="resetConfig">重置默认</el-button>
+          <el-icon :class="{ 'is-expanded': configExpanded }" class="config-arrow">
+            <ArrowDown />
+          </el-icon>
+        </div>
+      </div>
+      <div v-show="configExpanded" class="config-body">
+        <div
+          v-for="item in getCurrentStrategy()?.configSchema || []"
+          :key="item.key"
+          class="config-item"
+        >
+          <label class="config-label">{{ item.label }}</label>
+          <el-input-number
+            v-if="item.type === 'int'"
+            :model-value="currentConfigValues[item.key] ?? item.default"
+            :min="item.min"
+            :max="item.max"
+            :step="item.step || 1"
+            size="small"
+            controls-position="right"
+            style="width: 160px"
+            @update:model-value="onConfigChange(item.key, $event)"
+          />
+          <el-input-number
+            v-else-if="item.type === 'float'"
+            :model-value="currentConfigValues[item.key] ?? item.default"
+            :min="item.min"
+            :max="item.max"
+            :step="item.step || 0.01"
+            :precision="3"
+            size="small"
+            controls-position="right"
+            style="width: 160px"
+            @update:model-value="onConfigChange(item.key, $event)"
+          />
+          <span class="config-desc">{{ item.description }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { Search, Loading } from '@element-plus/icons-vue'
+import { Search, Loading, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { Skill } from '@/types'
+import type { StrategyInfo } from '@/types/stock'
 import type { StockSearchResult } from '@/types/stock'
 
 const props = defineProps<{
   modelValue: string[]
   days: number
-  skills: Skill[]
-  selectedSkills: string[]
+  strategyList: StrategyInfo[]
+  selectedStrategy: string
+  strategyConfig: Record<string, any>
   isAnalyzing: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [codes: string[]]
   'update:days': [days: number]
-  'update:selectedSkills': [skills: string[]]
+  'update:selectedStrategy': [strategy: string]
+  'update:strategyConfig': [config: Record<string, any>]
   start: []
   clear: []
 }>()
+
+// 策略配置面板
+const configExpanded = ref(false)
+const currentConfigValues = ref<Record<string, any>>({})
+
+function getCurrentStrategy(): StrategyInfo | undefined {
+  return props.strategyList.find(s => s.id === props.selectedStrategy)
+}
+
+function onStrategyChange(strategyId: string) {
+  emit('update:selectedStrategy', strategyId)
+  // 切换策略时重置配置为默认值
+  const strategy = props.strategyList.find(s => s.id === strategyId)
+  if (strategy) {
+    const defaults: Record<string, any> = {}
+    strategy.configSchema.forEach(item => {
+      defaults[item.key] = item.default
+    })
+    currentConfigValues.value = defaults
+    emit('update:strategyConfig', { ...defaults })
+  }
+}
+
+function resetConfig() {
+  const strategy = getCurrentStrategy()
+  if (strategy) {
+    const defaults: Record<string, any> = {}
+    strategy.configSchema.forEach(item => {
+      defaults[item.key] = item.default
+    })
+    currentConfigValues.value = { ...defaults }
+    emit('update:strategyConfig', { ...defaults })
+  }
+}
+
+function onConfigChange(key: string, value: any) {
+  currentConfigValues.value[key] = value
+  emit('update:strategyConfig', { ...currentConfigValues.value })
+}
+
+function getSummary(config: Record<string, any>): string {
+  const strategy = getCurrentStrategy()
+  if (!strategy || !strategy.configSchema || strategy.configSchema.length === 0) return ''
+  // 取前3个参数作为摘要
+  return strategy.configSchema.slice(0, 3)
+    .map(item => {
+      const val = config[item.key] ?? item.default
+      return `${item.label.split(/[（(]/)[0]}${val}`
+    })
+    .join(' · ')
+}
 
 // 手动输入标签
 const inputVisible = ref(false)
@@ -355,6 +456,85 @@ function addCheckedStocks() {
   margin-top: 6px;
   font-size: 12px;
   color: var(--el-text-color-secondary);
+}
+
+/* 策略配置折叠面板 */
+.strategy-config-panel {
+  margin-top: 4px;
+  margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 8px;
+  background: var(--el-bg-color);
+  overflow: hidden;
+}
+.config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.config-header:hover {
+  background: var(--el-fill-color-light);
+}
+.config-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.config-strategy-name {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.config-summary-text {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.config-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.config-arrow {
+  transition: transform 0.2s;
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+}
+.config-arrow.is-expanded {
+  transform: rotate(180deg);
+}
+.config-body {
+  padding: 8px 14px 14px;
+  border-top: 1px solid var(--el-border-color-lighter);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.config-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.config-label {
+  font-size: 13px;
+  color: var(--el-text-color-regular);
+  white-space: nowrap;
+  min-width: 110px;
+}
+.config-desc {
+  font-size: 11px;
+  color: var(--el-text-color-placeholder);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .option-item {
   display: flex;
