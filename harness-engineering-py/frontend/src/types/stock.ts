@@ -1,7 +1,7 @@
 export interface DiagnosisResult {
   code: string
   name: string
-  conclusion: "看多" | "看空" | "观望" | null
+  conclusion: "买入" | "观望" | null
   reason: string
   close: number | null
   open: number | null
@@ -13,10 +13,30 @@ export interface DiagnosisResult {
   klineDate?: string
 }
 
+export interface StrategyConfigItem {
+  key: string
+  label: string
+  type: "int" | "float"
+  default: number
+  min?: number
+  max?: number
+  step?: number
+  description: string
+}
+
+export interface StrategyInfo {
+  id: string
+  name: string
+  description: string
+  configSchema: StrategyConfigItem[]
+}
+
 export interface StockDiagnosis {
   codes: string[]
   sector?: string
   days: number
+  strategy: string
+  strategyConfig: Record<string, any>
   skills: string[]
   skillNames: string[]
   initialPrompt: string
