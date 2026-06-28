@@ -38,7 +38,7 @@ class ChatMessage(BaseModel):
 class DiagnosisResult(BaseModel):
     code: str
     name: str = ""
-    conclusion: Optional[str] = None  # "看多" | "看空" | "观望" | None(失败)
+    conclusion: Optional[str] = None  # "买入" | "观望" | None(失败)
     reason: str = ""
     close: Optional[float] = None
     open: Optional[float] = None
@@ -54,9 +54,11 @@ class StockDiagnosis(BaseModel):
     codes: List[str] = []
     sector: Optional[str] = None  # 板块代码（如果是按板块分析）
     days: int = 90
-    skills: List[str] = []
-    skillNames: List[str] = []  # 已解析的 skill 名称（与 skills 一一对应）
-    initialPrompt: str = ""  # 传给 OpenCode 的初始提示词模板（第一条股票的实际 prompt，方便调试）
+    strategy: str = ""  # 策略 ID，如 "ema_pullback"
+    strategyConfig: dict = {}  # 用户覆盖的策略配置
+    skills: List[str] = []  # 保留兼容，不再使用
+    skillNames: List[str] = []  # 保留兼容，不再使用
+    initialPrompt: str = ""  # 保留兼容，不再使用
     results: List[DiagnosisResult] = []
     successCount: int = 0
     failedCount: int = 0
@@ -115,9 +117,11 @@ class StockAnalyzeRequest(BaseModel):
     codes: List[str] = []
     sector: Optional[str] = None  # 板块代码，如 BK1036（与 codes 互斥，优先 sector）
     days: int = 90
-    skills: List[str] = []
+    strategy: Optional[str] = None  # 策略 ID
+    strategyConfig: Optional[dict] = None  # 策略配置覆盖
+    skills: List[str] = []  # 保留兼容，不再使用
     sessionId: Optional[str] = None
-    model: Optional[str] = None  # 不填则使用 opencode 默认模型
+    model: Optional[str] = None  # 保留兼容，不再使用
 
 
 class StreamState:
