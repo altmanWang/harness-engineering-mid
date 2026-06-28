@@ -30,6 +30,13 @@
         v-if="items.length > 0"
         :items="items"
         :session-id="sessionId || loadedSessionId || ''"
+        @backtest="handleBacktest"
+      />
+
+      <BacktestDialog
+        v-model="backtestVisible"
+        :result="backtestResult"
+        :session-id="sessionId || loadedSessionId || ''"
       />
 
       <div v-if="isAnalyzing && !isSuppressed" class="analysis-progress">
@@ -73,8 +80,10 @@ import { useChatStore } from '@/stores/chat'
 import StockInput from '@/components/stock/StockInput.vue'
 import StockResultTable from '@/components/stock/StockResultTable.vue'
 import StockCompare from '@/components/stock/StockCompare.vue'
+import BacktestDialog from '@/components/stock/BacktestDialog.vue'
 import { useStockAnalysis } from '@/composables/useStockAnalysis'
 import type { StrategyInfo } from '@/types/stock'
+import type { DiagnosisResult } from '@/types/stock'
 import type { StockItem } from '@/composables/useStockAnalysis'
 import type { ChatSession } from '@/types/chat'
 
@@ -89,6 +98,9 @@ const days = ref(90)
 const strategyList = ref<StrategyInfo[]>([])
 const selectedStrategy = ref('ema_pullback')
 const strategyConfig = ref<Record<string, any>>({})
+
+const backtestVisible = ref(false)
+const backtestResult = ref<DiagnosisResult | null>(null)
 
 const viewingRecord = ref<ChatSession | null>(null)
 const loadedSessionId = ref<string | null>(null)
@@ -215,6 +227,12 @@ async function handleAskAI() {
     timestamp: new Date().toISOString(),
   }]
   router.push('/')
+}
+
+function handleBacktest(row: StockItem) {
+  if (!row.result) return
+  backtestResult.value = row.result
+  backtestVisible.value = true
 }
 </script>
 
