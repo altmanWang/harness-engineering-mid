@@ -18,7 +18,7 @@ from pydantic import BaseModel
 
 from app.models.schemas import (
     StockAnalyzeRequest, StockDiagnosis, DiagnosisResult,
-    ChatSession, ChatMessage, BacktestSummary,
+    ChatSession, ChatMessage,
 )
 from app.services.session_store import save_session, get_session, list_sessions
 from app.services.worktree_manager import WORKTREES_DIR
@@ -801,16 +801,15 @@ async def trigger_backtest(body: BacktestTriggerRequest):
     strategy_config = _validate_config(body.strategy, body.strategyConfig or {})
 
     # 运行回测（同步，在线程池中执行）
-    import concurrent.futures as _futures
-    import asyncio as _asyncio
-
-    loop = _asyncio.get_running_loop()
     try:
-        with _futures.ThreadPoolExecutor(max_workers=1) as pool:
-            result = await loop.run_in_executor(
-                pool,
-                lambda: run_backtest(kline_path, output_dir=str(backtest_dir), config_overrides=strategy_config),
-            )
+        result = await asyncio.wait_for(
+            asyncio.to_thread(
+                run_backtest, kline_path,
+                output_dir=str(backtest_dir),
+                config_overrides=strategy_config,
+            ),
+            timeout=300.0,  # 5 minutes
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Backtest failed: {e}")
 
