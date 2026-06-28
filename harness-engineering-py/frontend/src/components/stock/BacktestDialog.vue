@@ -119,6 +119,7 @@ function onOpened() {
 
 function onClosed() {
   reset()
+  klineData.value = []
   disposeCharts()
 }
 
