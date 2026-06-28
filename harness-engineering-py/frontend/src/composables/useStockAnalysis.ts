@@ -51,7 +51,7 @@ export function useStockAnalysis() {
     }
   }
 
-  async function startAnalysis(codes: string[], days: number, skills: string[], existingSessionId?: string, model?: string) {
+  async function startAnalysis(codes: string[], days: number, strategy: string, strategyConfig: Record<string, any>, existingSessionId?: string) {
     if (isAnalyzing.value) return
 
     initItems(codes)
@@ -68,9 +68,9 @@ export function useStockAnalysis() {
         body: JSON.stringify({
           codes,
           days,
-          skills,
+          strategy,
+          strategyConfig,
           sessionId: existingSessionId || undefined,
-          model: model || undefined,
         }),
       })
 
