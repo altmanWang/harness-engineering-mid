@@ -698,6 +698,8 @@ function addCheckedStocks() {
 /* 搜索结果下拉 */
 .search-dropdown {
   position: absolute;
+  top: 100%;
+  left: 0;
   z-index: 1000;
   margin-top: 6px;
   width: 100%;
