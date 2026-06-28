@@ -51,17 +51,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="理由" min-width="200" show-overflow-tooltip>
-        <template #default="{ row }">
-          <template v-if="row.status === 'done' && row.result">
-            {{ row.result.reason }}
-          </template>
-          <template v-else-if="row.status === 'error'">
-            <span class="text-danger">{{ row.error }}</span>
-          </template>
-        </template>
-      </el-table-column>
-
       <el-table-column label="收盘" width="80" align="right" sortable>
         <template #default="{ row }">
           <template v-if="row.status === 'done' && row.result && row.result.close !== null">
