@@ -15,8 +15,9 @@
       <StockInput
         v-model="codes"
         v-model:days="days"
-        :skills="skillList"
-        v-model:selected-skills="selectedSkills"
+        :strategy-list="strategyList"
+        v-model:selected-strategy="selectedStrategy"
+        v-model:strategy-config="strategyConfig"
         :is-analyzing="isAnalyzing"
         @start="handleStart"
         @clear="handleClear"
@@ -62,7 +63,7 @@ import StockInput from '@/components/stock/StockInput.vue'
 import StockResultTable from '@/components/stock/StockResultTable.vue'
 import StockCompare from '@/components/stock/StockCompare.vue'
 import { useStockAnalysis } from '@/composables/useStockAnalysis'
-import type { Skill } from '@/types'
+import type { StrategyInfo } from '@/types/stock'
 import type { StockItem } from '@/composables/useStockAnalysis'
 import type { ChatSession } from '@/types/chat'
 
@@ -74,8 +75,9 @@ const { items, isAnalyzing, isSuppressed, totalCount, completedCount, startAnaly
 
 const codes = ref<string[]>([])
 const days = ref(90)
-const skillList = ref<Skill[]>([])
-const selectedSkills = ref<string[]>([])
+const strategyList = ref<StrategyInfo[]>([])
+const selectedStrategy = ref('ema_pullback')
+const strategyConfig = ref<Record<string, any>>({})
 
 const viewingRecord = ref<ChatSession | null>(null)
 const loadedSessionId = ref<string | null>(null)
@@ -95,10 +97,18 @@ const compareRecords = computed(() => {
 
 onMounted(async () => {
   try {
-    const res = await fetch('/api/skills')
+    const res = await fetch('/api/stock/strategies')
     if (res.ok) {
       const data = await res.json()
-      skillList.value = data.skills || []
+      strategyList.value = data.strategies || []
+      // 初始化第一个策略的默认配置
+      if (strategyList.value.length > 0) {
+        const defaults: Record<string, any> = {}
+        strategyList.value[0].configSchema.forEach(item => {
+          defaults[item.key] = item.default
+        })
+        strategyConfig.value = defaults
+      }
     }
   } catch {}
 
@@ -133,7 +143,8 @@ function loadViewingRecord() {
 
     codes.value = session.diagnosis.codes || []
     days.value = session.diagnosis.days || 90
-    selectedSkills.value = session.diagnosis.skills || []
+    selectedStrategy.value = session.diagnosis.strategy || 'ema_pullback'
+    strategyConfig.value = session.diagnosis.strategyConfig || {}
 
     const diag = session.diagnosis
     items.value = (diag.codes || []).map(code => {
@@ -160,7 +171,7 @@ async function handleStart() {
   viewingRecord.value = null
   loadedSessionId.value = null
   try {
-    await startAnalysis(codes.value, days.value, selectedSkills.value, undefined, chatStore.model || undefined)
+    await startAnalysis(codes.value, days.value, selectedStrategy.value, strategyConfig.value)
     await chatStore.loadSessions()
   } catch (err: any) {
     ElMessage.error(err?.message || '分析启动失败，请重试')
