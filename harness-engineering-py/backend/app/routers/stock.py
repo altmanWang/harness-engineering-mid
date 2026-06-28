@@ -19,10 +19,10 @@ from app.models.schemas import (
     StockAnalyzeRequest, StockDiagnosis, DiagnosisResult,
     ChatSession, ChatMessage,
 )
-from app.services.engine_factory import get_or_create_engine
 from app.services.session_store import save_session, get_session, list_sessions
-from app.services.worktree_manager import ensure_worktree, WORKTREES_DIR
-from app.services.skill_store import load_skill_to_worktree, get_skill_metadata
+from app.services.worktree_manager import WORKTREES_DIR
+from app.backtest_albrooks.strategies.registry import STRATEGY_REGISTRY
+from app.backtest_albrooks.engine.runner import run_signal
 
 # 确保 a_stock_client 可导入
 _STOCK_CLIENT_ROOT = Path(__file__).resolve().parent.parent.parent / "a_stock_client"
@@ -152,6 +152,45 @@ def _parse_conclusion(text: str) -> dict:
     return {"conclusion": conclusion, "reason": reason}
 
 
+def _validate_config(strategy_id: str, config: dict) -> dict:
+    """校验并转换用户配置：确保类型正确、值在合法范围内。"""
+    entry = STRATEGY_REGISTRY.get(strategy_id)
+    if entry is None:
+        raise HTTPException(status_code=400, detail=f"Unknown strategy: {strategy_id}")
+
+    schema = entry["configSchema"]
+    validated: dict = {}
+    for item in schema:
+        key = item["key"]
+        if key in config:
+            raw = config[key]
+            try:
+                if item["type"] == "int":
+                    val = int(raw)
+                elif item["type"] == "float":
+                    val = float(raw)
+                else:
+                    val = raw
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid value for {key}: {raw}"
+                )
+            # 范围检查
+            if "min" in item and val < item["min"]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{key} must be >= {item['min']}, got {val}"
+                )
+            if "max" in item and val > item["max"]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{key} must be <= {item['max']}, got {val}"
+                )
+            validated[key] = val
+    return validated
+
+
 def _build_prompt(code: str, name: str, kline_text: str, skill_names: list[str]) -> str:
     """构建单只股票的分析 prompt."""
     skills_section = ""
@@ -227,9 +266,9 @@ async def _run_analysis(
     analysis_id: str,
     codes: list[str],
     days: int,
-    skills: list[str],
+    strategy: str,
+    strategy_config: dict,
     session_id: str,
-    model: str = "",
     sector: str = "",
 ) -> None:
     """后台任务：串行分析每只股票，逐只 SSE 推送结果."""
@@ -239,24 +278,6 @@ async def _run_analysis(
     client = AStockClient()
     session = await get_session(session_id)
     if session is None:
-        return
-
-    # 1. 先预加载 skills 到 worktree（在创建 engine 之前，确保 opencode 启动时可见）
-    worktree_dir = str(ensure_worktree(session_id))
-    skill_names: list[str] = []
-    for skill_id in skills:
-        try:
-            result = await load_skill_to_worktree(skill_id, session_id)
-            meta = await get_skill_metadata(skill_id)
-            if meta:
-                skill_names.append(meta.get("name", skill_id))
-        except Exception as e:
-            logger.warning(f"Failed to load skill {skill_id}: {e}")
-
-    # 2. 创建 engine（skills 已在 worktree 中）
-    engine = await get_or_create_engine(session_id)
-    if engine is None:
-        await _stream_event(analysis_id, "error", {"message": "引擎不可用"})
         return
 
     end_date = datetime.now().strftime("%Y-%m-%d")
@@ -270,8 +291,6 @@ async def _run_analysis(
     results: list = []
     success_count = 0
     failed_count = 0
-    first_prompt = ""  # 第一条股票的实际 prompt，存到 session 方便调试
-    agent_session_id: Optional[str] = None  # OpenCode agent session ID，存到 session 方便调试
 
     for code in codes:
         try:
@@ -296,39 +315,9 @@ async def _run_analysis(
             # 相对路径：worktrees/session-{sessionId}/kline/{filename}
             kline_rel_path = f"worktrees/{session_id}/kline/{kline_filename}"
 
-            kline_text = _df_to_text(df)
-            prompt = _build_prompt(code, name, kline_text, skill_names)
-            if not first_prompt:
-                first_prompt = prompt
-
-            collected = []
-
-            def on_text(evt):
-                if evt.type == "text" and evt.content:
-                    collected.append(evt.content)
-
-            engine.on("stream", on_text)
-            try:
-                result = await engine.execute({
-                    "prompt": prompt,
-                    "model": model,
-                    "workingDirectory": worktree_dir,
-                    "sessionId": agent_session_id,
-                })
-            finally:
-                engine.off("stream", on_text)
-
-            # 首次执行时捕获 OpenCode agent session ID 并持久化
-            if not agent_session_id and result and result.get("sessionId"):
-                agent_session_id = result["sessionId"]
-                session.agentSessionId = agent_session_id
-                await save_session(session)
-
-            output = result.get("output", "") if result else ""
-            if not output:
-                output = "".join(collected)
-
-            parsed = _parse_conclusion(output)
+            # 调用策略信号（替代 LLM）
+            signal_result = run_signal(str(kline_path), config_overrides=strategy_config)
+            conclusion = signal_result["signal"]  # "买入" 或 "观望"
 
             kline_date = str(last_row.get("date", ""))
             if hasattr(kline_date, "strftime"):
@@ -337,8 +326,8 @@ async def _run_analysis(
             diagnosis_result = DiagnosisResult(
                 code=code,
                 name=name,
-                conclusion=parsed["conclusion"],
-                reason=parsed["reason"] or output[:200],
+                conclusion=conclusion,
+                reason="",  # 策略模式无文本理由
                 close=close_val,
                 open=open_val,
                 pct_chg=pct_chg_val,
@@ -373,9 +362,11 @@ async def _run_analysis(
         codes=codes,
         sector=sector or None,
         days=days,
-        skills=skills,
-        skillNames=skill_names,
-        initialPrompt=first_prompt,
+        strategy=strategy,
+        strategyConfig=strategy_config,
+        skills=[],
+        skillNames=[],
+        initialPrompt="",
         results=results,
         successCount=success_count,
         failedCount=failed_count,
@@ -407,6 +398,12 @@ async def start_analysis(body: StockAnalyzeRequest):
         sector_name = ""
 
     from datetime import datetime as dt
+
+    # 校验策略
+    strategy = body.strategy or "ema_pullback"
+    if strategy not in STRATEGY_REGISTRY:
+        raise HTTPException(status_code=400, detail=f"Unknown strategy: {strategy}")
+    strategy_config = _validate_config(strategy, body.strategyConfig or {})
 
     if body.sessionId:
         session = await get_session(body.sessionId)
@@ -444,9 +441,9 @@ async def start_analysis(body: StockAnalyzeRequest):
             analysis_id=analysis_id,
             codes=codes,
             days=body.days,
-            skills=body.skills,
+            strategy=strategy,
+            strategy_config=strategy_config,
             session_id=session.id,
-            model=body.model or "",
             sector=body.sector or "",
         )
     )
@@ -504,6 +501,20 @@ async def stream_analysis(id: str = Query(..., alias="analysisId")):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@router.get("/stock/strategies")
+async def list_strategies():
+    """返回所有可用策略列表，供前端下拉选择。"""
+    strategies = []
+    for entry in STRATEGY_REGISTRY.values():
+        strategies.append({
+            "id": entry["id"],
+            "name": entry["name"],
+            "description": entry["description"],
+            "configSchema": entry["configSchema"],
+        })
+    return {"strategies": strategies}
 
 
 @router.get("/stock/sectors")
