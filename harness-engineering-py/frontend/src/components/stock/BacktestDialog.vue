@@ -147,30 +147,40 @@ function renderKLineChart() {
   if (klineInstance) klineInstance.dispose()
   klineInstance = echarts.init(klineChartRef.value)
 
+  // X-axis: always use bars dates (consistent with return/capital charts for dataZoom sync)
   const dates = bars.value.map(b => b.date)
 
-  // Use real K-line data if available, otherwise approximate from bars
-  const ohlcData = klineData.value.length > 0
-    ? klineData.value.map(d => [d.open, d.close, d.low, d.high])
-    : bars.value.map(b => {
-        const o = b.open; const c = b.close
-        return [o, c, Math.max(o, c), Math.min(o, c)]
-      })
+  // Build date->kline-row map for OHLC lookup
+  const klineByDate: Record<string, { open: number; close: number; high: number; low: number; volume: number }> = {}
+  for (const d of klineData.value) {
+    klineByDate[d.date] = { open: d.open, close: d.close, high: d.high, low: d.low, volume: d.volume }
+  }
 
-  const volumeData = klineData.value.length > 0
-    ? klineData.value.map(d => d.volume)
-    : bars.value.map(b => {
-        const cost = b.cost || 0
-        return cost > 0 ? Math.round(cost / (b.close || 1)) : 0
-      })
+  // OHLC: look up by date from klineData, fall back to bars open/close
+  const ohlcData = bars.value.map(b => {
+    const k = klineByDate[b.date]
+    if (k) return [k.open, k.close, k.low, k.high]
+    return [b.open, b.close, Math.max(b.open, b.close), Math.min(b.open, b.close)]
+  })
 
-  // Buy/Sell markers from backtest bars
-  const buyMarks = bars.value
-    .map((b, i) => b.signal === '买入' ? { coord: [dates[i], ohlcData[i][2]], value: '买入' } : null)
-    .filter(Boolean) as { coord: [string, number]; value: string }[]
-  const sellMarks = bars.value
-    .map((b, i) => b.signal === '卖出' ? { coord: [dates[i], ohlcData[i][3]], value: '卖出' } : null)
-    .filter(Boolean) as { coord: [string, number]; value: string }[]
+  const volumeData = bars.value.map(b => {
+    const k = klineByDate[b.date]
+    if (k) return k.volume
+    const cost = b.cost || 0
+    return cost > 0 ? Math.round(cost / (b.close || 1)) : 0
+  })
+
+  // Buy/Sell markers: use bar.close as actual trade price, date as coord
+  const buyMarks: { coord: [string, number]; value: string }[] = []
+  const sellMarks: { coord: [string, number]; value: string }[] = []
+
+  for (const bar of bars.value) {
+    if (bar.signal === '买入') {
+      buyMarks.push({ coord: [bar.date, bar.close], value: '买入' })
+    } else if (bar.signal === '卖出') {
+      sellMarks.push({ coord: [bar.date, bar.close], value: '卖出' })
+    }
+  }
 
   const option: echarts.EChartsOption = {
     tooltip: {
